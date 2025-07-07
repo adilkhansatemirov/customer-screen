@@ -1,0 +1,70 @@
+# Build results
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.appx
+*.vsix
+*.nupkg
+
+# VS temporary files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+# Rider
+.idea/
+
+# NuGet
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+
+# Auto-generated files
+*.Generated.cs
+*.Designer.cs
+*.g.cs
+*.g.i.cs
+
+# Windows image thumbnails
+Thumbs.db
+
+# DotCover
+*.dotCover
+
+# Logs
+*.log
+
+# Plugin config
+**/PluginConfigs/
+
+# Local iiko dev plugin folders (if any)
+**/PluginDeploy/
+**/CustomerScreen.front.config.xml
+
+# Misc
+*.tmp
+*.bak
+*.cache
+*.swp
+*.orig
+*.scc
+
+# JetBrains Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# WPF-specific
+*.psess
+*.vsp
+*.vspx
