@@ -82,7 +82,7 @@ namespace Resto.Front.Api.CustomerScreen
             PluginContext.Log.Info("Customer screen was shown.");
 
             customerScreen.WindowState = WindowState.Maximized;
-            customerScreen.mediaControl.StartPlayer();
+            //customerScreen.mediaControl.StartPlayer();
         }
 
         private static void OnScreenChanged(IScreen screen)

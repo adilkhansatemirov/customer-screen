@@ -51,7 +51,7 @@ namespace Resto.Front.Api.CustomerScreen.View
 
         public void ChangeSumChanged(decimal sum)
         {
-            ctlResultSum.ChangeSumChanged(sum);
+            //ctlResultSum.ChangeSumChanged(sum);
         }
 
         private async void ApiRequestButton_Click(object sender, RoutedEventArgs e)
@@ -81,12 +81,12 @@ namespace Resto.Front.Api.CustomerScreen.View
                     PluginContext.Log.Info(users.ToString());
 
                     // Показываем первые 10 задач
-                    ApiResultList.ItemsSource = users.data;
+                    //ApiResultList.ItemsSource = users.data;
                 }
             }
             catch (Exception ex)
             {
-                ApiResultList.ItemsSource = new[] { "Ошибка при запросе: " + ex.Message };
+                //ApiResultList.ItemsSource = new[] { "Ошибка при запросе: " + ex.Message };
             }
         }
 

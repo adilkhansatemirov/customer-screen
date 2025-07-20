@@ -2,11 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:resources="clr-namespace:Resto.Front.Api.CustomerScreen.Resources" 
-        xmlns:controls="clr-namespace:Resto.Front.Api.CustomerScreen.View.Controls"
-        FontFamily="{DynamicResource default_FontFamily}"
-        FontSize="{DynamicResource FontSizeNormal}"
+        xmlns:controls="clr-namespace:Resto.Front.Api.CustomerScreen.View.Controls"   
         WindowStartupLocation="Manual"
-        Background="{DynamicResource defaultWindowBg}"
         WindowStyle="None"
         BorderThickness="0"
         ShowActivated="False"
@@ -26,6 +23,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
+    <!--
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*" />
@@ -36,23 +34,19 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Верх-Лево -->
         <Grid Grid.Row="0" Grid.Column="0" Background="{StaticResource customerZoneLeftTopBackColor}">
             <controls:CustomerMediaControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="mediaControl"/>
         </Grid>
 
-        <!-- Верх-Право -->
         <Grid Grid.Row="0" Grid.Column="1" Background="{StaticResource customerZoneRightTopBackColor}" Margin="-1">
             <controls:CustomerOrderItemsControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="6"
                 Visibility="{Binding Path=SumAfterCorrections, Converter={StaticResource NotDecimalZeroToVisibilityConverter}, FallbackValue=Collapsed}"/>
         </Grid>
 
-        <!-- Низ-Лево+Право -->
         <Grid Grid.Row="1" Grid.Column="0" Background="{StaticResource customerZoneBottomBackColor}" Margin="-1">
             <controls:CustomerResultSumControl x:Name="ctlResultSum"/>
         </Grid>
 
-        <!-- Низ-Право — с кнопкой и списком -->
         <Grid Grid.Row="1" Grid.Column="1" Background="{StaticResource customerZoneBottomBackColor}" Margin="-1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -77,4 +71,29 @@
                      ScrollViewer.VerticalScrollBarVisibility="Auto"/>
         </Grid>
     </Grid>
+ -->
+
+    <Grid Background="Black">
+        <ContentControl>
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentScreen}" Value="Welcome">
+                            <Setter Property="Content">
+                                <Setter.Value>
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock Text="Welcome to Our Restaurant" FontSize="24" Foreground="White" TextAlignment="Center"/>
+                                        <TextBlock Text="Please wait while your order is being prepared..." FontSize="16" Foreground="LightGray" TextAlignment="Center"/>
+                                        <Button Content="Next" Width="200" Height="40"/>
+                                    </StackPanel>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
+    </Grid>
+   
 </Window>
