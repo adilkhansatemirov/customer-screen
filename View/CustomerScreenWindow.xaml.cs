@@ -1,26 +1,68 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
-using static Resto.Front.Api.CustomerScreen.View.CustomerScreenWindow;
+using System.Windows.Controls;
 
 namespace Resto.Front.Api.CustomerScreen.View
 {
-    /// <summary>
-    /// Interaction logic for CustomerScreenWindow.xaml
-    /// </summary>
-    public partial class CustomerScreenWindow
+    public partial class CustomerScreenWindow : Window, INotifyPropertyChanged
     {
         public bool CanBeClosed = false;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private ScreenType currentScreen = ScreenType.Welcome;
+        public ScreenType CurrentScreen
+        {
+            get => currentScreen;
+            set
+            {
+                currentScreen = value;
+                PluginContext.Log.Info("CurrentScreen set to: " + currentScreen);
+                OnPropertyChanged(nameof(CurrentScreen));
+            }
+        }
+
+        private ObservableCollection<User> users;
+        public ObservableCollection<User> Users
+        {
+            get => users;
+            set
+            {
+                users = value;
+                OnPropertyChanged(nameof(Users));
+            }
+        }
+
+        private string errorMessage;
+        public string ErrorMessage
+        {
+            get => errorMessage;
+            set
+            {
+                errorMessage = value;
+                OnPropertyChanged(nameof(ErrorMessage));
+            }
+        }
+
+        protected void OnPropertyChanged(string propertyName) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public CustomerScreenWindow()
         {
             InitializeComponent();
-            SizeChanged += CustomerScreenWindow_SizeChanged;
-            StateChanged += CustomerScreenWindow_StateChanged;
-            Closing += CustomerScreenWindow_Closing;
+            //SizeChanged += CustomerScreenWindow_SizeChanged;
+            //StateChanged += CustomerScreenWindow_StateChanged;
+            //Closing += CustomerScreenWindow_Closing;
+
+            DataContext = this;
+            CurrentScreen = ScreenType.Welcome;
+            PluginContext.Log.Info("Set screen to: " + CurrentScreen);
         }
 
         void CustomerScreenWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -37,16 +79,14 @@ namespace Resto.Front.Api.CustomerScreen.View
 
         private void CustomerScreenWindow_StateChanged(object sender, EventArgs e)
         {
-            PluginContext.Log.InfoFormat("Customer window state changed. Window state is {0}", WindowState);
-            if (WindowState == System.Windows.WindowState.Minimized)
-                WindowState = System.Windows.WindowState.Maximized;
+            if (WindowState == WindowState.Minimized)
+                WindowState = WindowState.Maximized;
         }
 
-        void CustomerScreenWindow_SizeChanged(object sender, System.Windows.SizeChangedEventArgs e)
+        void CustomerScreenWindow_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            PluginContext.Log.InfoFormat("Customer window size changed. Window state is {0}", WindowState);
-            if (WindowState == System.Windows.WindowState.Minimized)
-                WindowState = System.Windows.WindowState.Maximized;
+            if (WindowState == WindowState.Minimized)
+                WindowState = WindowState.Maximized;
         }
 
         public void ChangeSumChanged(decimal sum)
@@ -56,37 +96,29 @@ namespace Resto.Front.Api.CustomerScreen.View
 
         private async void ApiRequestButton_Click(object sender, RoutedEventArgs e)
         {
-            PluginContext.Log.Info("ApiRequestButton_Click fired 1");
-            await MakeApiRequestAsync();
-            PluginContext.Log.Info("ApiRequestButton_Click fired");
+            CurrentScreen = ScreenType.Loading;
+            try
+            {
+                await MakeApiRequestAsync();
+                CurrentScreen = ScreenType.Success;
+            }
+            catch (Exception ex)
+            {
+                PluginContext.Log.Info("API request failed: " + ex.Message);
+                ErrorMessage = ex.Message;
+                CurrentScreen = ScreenType.Error;
+            }
         }
 
         private async Task MakeApiRequestAsync()
         {
-            PluginContext.Log.Info("ApiRequestButton_Click fired 2");
-            try
+            using (var httpClient = new HttpClient())
             {
-                using (var httpClient = new HttpClient())
-                {
-                    var url = "https://reqres.in/api/users?page=1";
-                    var response = await httpClient.GetStringAsync(url);
-                    var users = JsonConvert.DeserializeObject<UserResponse>(response);
-
-                    // Выводим в лог
-                    foreach (var user in users.data)
-                    {
-                        PluginContext.Log.Info(user.ToString());
-                    }
-                    PluginContext.Log.Info(response.ToString());
-                    PluginContext.Log.Info(users.ToString());
-
-                    // Показываем первые 10 задач
-                    //ApiResultList.ItemsSource = users.data;
-                }
-            }
-            catch (Exception ex)
-            {
-                //ApiResultList.ItemsSource = new[] { "Ошибка при запросе: " + ex.Message };
+                httpClient.DefaultRequestHeaders.Add("x-api-key", "reqres-free-v1");
+                var url = "https://reqres.in/api/users?page=1";
+                var response = await httpClient.GetStringAsync(url);
+                var users = JsonConvert.DeserializeObject<UserResponse>(response);
+                Users = new ObservableCollection<User>(users.data);
             }
         }
 
@@ -97,15 +129,52 @@ namespace Resto.Front.Api.CustomerScreen.View
             public string first_name { get; set; }
             public string last_name { get; set; }
 
-            public override string ToString()
-            {
-                return $"{first_name} {last_name} ({email})";
-            }
+            public override string ToString() => $"{first_name} {last_name} ({email})";
         }
 
         public class UserResponse
         {
             public List<User> data { get; set; }
         }
+    }
+
+    public class ScreenTemplateSelector : DataTemplateSelector
+    {
+        public DataTemplate WelcomeTemplate { get; set; }
+        public DataTemplate LoadingTemplate { get; set; }
+        public DataTemplate SuccessTemplate { get; set; }
+        public DataTemplate ErrorTemplate { get; set; }
+
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            PluginContext.Log.Info("SelectTemplate called with: " + item);
+
+            if (item is ScreenType screenType)
+            {
+                switch (screenType)
+                {
+                    case ScreenType.Welcome:
+                        return WelcomeTemplate;
+                    case ScreenType.Loading:
+                        return LoadingTemplate;
+                    case ScreenType.Success:
+                        return SuccessTemplate;
+                    case ScreenType.Error:
+                        return ErrorTemplate;
+                    default:
+                        return WelcomeTemplate;
+                }
+            }
+
+            return base.SelectTemplate(item, container);
+        }
+    }
+
+    public enum ScreenType
+    {
+        Welcome,
+        Loading,
+        Success,
+        Error
     }
 }

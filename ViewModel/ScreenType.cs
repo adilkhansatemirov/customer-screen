@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace Resto.Front.Api.CustomerScreen.ViewModel
 {
-    internal enum ScreenType
+    public enum ScreenType
     {
         Welcome,
-        Order,
+        Loading,
+        Error,
+        Success
         // Future screens can be added here
     }
 }

@@ -25,7 +25,6 @@ namespace Resto.Front.Api.CustomerScreen.ViewModel
         public Order()
         {
             Items = new ObservableCollection<OrderItem>();
-            CurrentScreen = ScreenType.Welcome;
         }
 
         public void Update(IOrder order)
@@ -196,15 +195,6 @@ namespace Resto.Front.Api.CustomerScreen.ViewModel
         {
             Items.Insert(index, new OrderItemModifier(zeroAmountModifier));
 
-        }
-
-        private static readonly DependencyProperty CurrentScreenProperty =
-        DependencyProperty.Register(nameof(CurrentScreen), typeof(ScreenType), typeof(Order));
-
-        public ScreenType CurrentScreen
-        {
-            get => (ScreenType)GetValue(CurrentScreenProperty);
-            set => SetValue(CurrentScreenProperty, value);
         }
     }
 }
