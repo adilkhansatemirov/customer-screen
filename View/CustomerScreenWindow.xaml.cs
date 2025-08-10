@@ -1,8 +1,11 @@
 ﻿using Newtonsoft.Json;
+using Resto.Front.Api.Data.Assortment;
+using Resto.Front.Api.Editors;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
@@ -101,6 +104,14 @@ namespace Resto.Front.Api.CustomerScreen.View
             {
                 await MakeApiRequestAsync();
                 CurrentScreen = ScreenType.Success;
+                var credentials = PluginContext.Operations.GetDefaultCredentials();
+                var editSession = PluginContext.Operations.CreateEditSession();
+                var newOrder = editSession.CreateOrder(null);
+                editSession.ChangeOrderOriginName("Customer Screen", newOrder);
+                var guest1 = editSession.AddOrderGuest("Bratishka", newOrder);
+                var firstProduct = PluginContext.Operations.GetActiveProducts().FirstOrDefault();
+                editSession.AddOrderProductItem(2m, firstProduct, newOrder, guest1, null);
+                var result = PluginContext.Operations.SubmitChanges(editSession, credentials);
             }
             catch (Exception ex)
             {
