@@ -31,6 +31,17 @@ namespace Resto.Front.Api.CustomerScreen.View
             }
         }
 
+        private LanguageEnum selectedLanguage;
+        public LanguageEnum SelectedLanguage
+        {
+            get => selectedLanguage;
+            set
+            {
+                selectedLanguage = value;
+                OnPropertyChanged(nameof(SelectedLanguage));
+            }
+        }
+
         private ObservableCollection<User> users;
         public ObservableCollection<User> Users
         {
@@ -97,6 +108,18 @@ namespace Resto.Front.Api.CustomerScreen.View
             //ctlResultSum.ChangeSumChanged(sum);
         }
 
+        private void RussianLanguageButton_Click(object sender, RoutedEventArgs e)
+        {
+            SelectedLanguage = LanguageEnum.Russian;
+            CurrentScreen = ScreenType.Loading; // or move to main flow
+        }
+
+        private void KazakhLanguageButton_Click(object sender, RoutedEventArgs e)
+        {
+            SelectedLanguage = LanguageEnum.Kazakh;
+            CurrentScreen = ScreenType.Loading; // or move to main flow
+        }
+
         private async void ApiRequestButton_Click(object sender, RoutedEventArgs e)
         {
             CurrentScreen = ScreenType.Loading;
@@ -151,34 +174,35 @@ namespace Resto.Front.Api.CustomerScreen.View
 
     public class ScreenTemplateSelector : DataTemplateSelector
     {
-        public DataTemplate WelcomeTemplate { get; set; }
+        public DataTemplate LanguageSelectorTemplate { get; set; }
         public DataTemplate LoadingTemplate { get; set; }
         public DataTemplate SuccessTemplate { get; set; }
         public DataTemplate ErrorTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            PluginContext.Log.Info("SelectTemplate called with: " + item);
-
             if (item is ScreenType screenType)
             {
                 switch (screenType)
                 {
                     case ScreenType.Welcome:
-                        return WelcomeTemplate;
+                        return LanguageSelectorTemplate;
                     case ScreenType.Loading:
                         return LoadingTemplate;
                     case ScreenType.Success:
                         return SuccessTemplate;
                     case ScreenType.Error:
                         return ErrorTemplate;
-                    default:
-                        return WelcomeTemplate;
                 }
             }
-
             return base.SelectTemplate(item, container);
         }
+    }
+
+    public enum LanguageEnum
+    {
+        Russian,
+        Kazakh
     }
 
     public enum ScreenType

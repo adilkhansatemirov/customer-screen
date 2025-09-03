@@ -12,12 +12,53 @@
 
     <Window.Resources>
         <!-- Individual templates -->
-        <DataTemplate x:Key="WelcomeTemplate">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock Text="Welcome to Our Restaurant" FontSize="24" Foreground="White" TextAlignment="Center"/>
-                <TextBlock Text="Please wait while your order is being prepared..." FontSize="16" Foreground="LightGray" TextAlignment="Center"/>
-                <Button Content="Next!" Width="200" Height="40" Click="ApiRequestButton_Click" />
-            </StackPanel>
+        <DataTemplate x:Key="LanguageSelectorTemplate">
+            <Grid>
+                <!-- Background image -->
+                <Image Source="https://pixabay.com/get/g48bd81e37792b69c13bc7edc8ea24c554d753650395514ce01666bea6893330e43c35f193de0c99667215db2c79071748a942db11bae198c89641cfeb5ad1de0_1280.jpg"
+               Stretch="Fill"
+               Panel.ZIndex="0"/>
+
+                <!-- Overlay content -->
+                <Border Background="White"
+                CornerRadius="20"
+                Opacity="0.9"
+                Width="420"
+                Padding="20"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+
+                    <StackPanel>
+                        <TextBlock Text="КАССА САМООБСЛУЖИВАНИЯ" 
+                           FontSize="24"
+                           FontWeight="Bold" 
+                           Foreground="Black"
+                           TextAlignment="Center"
+                           Margin="0,0,0,20"/>
+
+                        <!-- Buttons side-by-side -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="🇷🇺 РУССКИЙ ЯЗЫК"
+                            Width="180" Height="40"
+                            Margin="0,0,10,0"
+                            Click="RussianLanguageButton_Click"
+                            BorderThickness="0"
+                            Background="#0078D7"
+                            Foreground="White"
+                            FontWeight="Bold"
+                                    />
+
+                            <Button Content="🇰🇿 ҚАЗАҚ ТІЛІ"
+                            Width="180" Height="40"
+                            Click="KazakhLanguageButton_Click"
+                            BorderThickness="0"
+                            Background="#28A745"
+                            Foreground="White"
+                            FontWeight="Bold"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </DataTemplate>
 
         <DataTemplate x:Key="LoadingTemplate">
@@ -46,14 +87,20 @@
 
         <!-- Template Selector -->
         <local:ScreenTemplateSelector x:Key="ScreenSelector"
-                                      WelcomeTemplate="{StaticResource WelcomeTemplate}"
+                                      LanguageSelectorTemplate="{StaticResource LanguageSelectorTemplate}"
                                       LoadingTemplate="{StaticResource LoadingTemplate}"
                                       ErrorTemplate="{StaticResource ErrorTemplate}"
                                       SuccessTemplate="{StaticResource SuccessTemplate}" />
     </Window.Resources>
 
     <Grid Background="Yellow">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="31*"/>
+            <ColumnDefinition Width="72*"/>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition Width="7*"/>
+        </Grid.ColumnDefinitions>
         <ContentControl Content="{Binding CurrentScreen, RelativeSource={RelativeSource AncestorType=Window}}"
-                        ContentTemplateSelector="{StaticResource ScreenSelector}" />
+                        ContentTemplateSelector="{StaticResource ScreenSelector}" Grid.ColumnSpan="4" />
     </Grid>
 </Window>
