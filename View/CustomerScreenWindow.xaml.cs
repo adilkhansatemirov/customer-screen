@@ -9,7 +9,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace Resto.Front.Api.CustomerScreen.View
 {
@@ -39,6 +38,7 @@ namespace Resto.Front.Api.CustomerScreen.View
             {
                 selectedLanguage = value;
                 OnPropertyChanged(nameof(SelectedLanguage));
+                OnPropertyChanged("Item[]"); // refresh bindings for dictionary lookups
             }
         }
 
@@ -64,16 +64,26 @@ namespace Resto.Front.Api.CustomerScreen.View
             }
         }
 
+        // Translation indexer
+        public string this[string key]
+        {
+            get
+            {
+                if (Translations.Data.ContainsKey(SelectedLanguage) &&
+                    Translations.Data[SelectedLanguage].ContainsKey(key))
+                {
+                    return Translations.Data[SelectedLanguage][key];
+                }
+                return $"[{key}]"; // fallback so you can see missing keys
+            }
+        }
+
         protected void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public CustomerScreenWindow()
         {
             InitializeComponent();
-            //SizeChanged += CustomerScreenWindow_SizeChanged;
-            //StateChanged += CustomerScreenWindow_StateChanged;
-            //Closing += CustomerScreenWindow_Closing;
-
             DataContext = this;
             CurrentScreen = ScreenType.Welcome;
             PluginContext.Log.Info("Set screen to: " + CurrentScreen);
@@ -111,13 +121,13 @@ namespace Resto.Front.Api.CustomerScreen.View
         private void RussianLanguageButton_Click(object sender, RoutedEventArgs e)
         {
             SelectedLanguage = LanguageEnum.Russian;
-            CurrentScreen = ScreenType.Loading; // or move to main flow
+            CurrentScreen = ScreenType.Scanning;
         }
 
         private void KazakhLanguageButton_Click(object sender, RoutedEventArgs e)
         {
             SelectedLanguage = LanguageEnum.Kazakh;
-            CurrentScreen = ScreenType.Loading; // or move to main flow
+            CurrentScreen = ScreenType.Scanning;
         }
 
         private async void ApiRequestButton_Click(object sender, RoutedEventArgs e)
@@ -172,14 +182,15 @@ namespace Resto.Front.Api.CustomerScreen.View
         }
     }
 
-    public class ScreenTemplateSelector : DataTemplateSelector
+    public class ScreenTemplateSelector : System.Windows.Controls.DataTemplateSelector
     {
-        public DataTemplate LanguageSelectorTemplate { get; set; }
-        public DataTemplate LoadingTemplate { get; set; }
-        public DataTemplate SuccessTemplate { get; set; }
-        public DataTemplate ErrorTemplate { get; set; }
+        public System.Windows.DataTemplate LanguageSelectorTemplate { get; set; }
+        public System.Windows.DataTemplate ScanningTemplate { get; set; }
+        public System.Windows.DataTemplate LoadingTemplate { get; set; }
+        public System.Windows.DataTemplate SuccessTemplate { get; set; }
+        public System.Windows.DataTemplate ErrorTemplate { get; set; }
 
-        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        public override System.Windows.DataTemplate SelectTemplate(object item, System.Windows.DependencyObject container)
         {
             if (item is ScreenType screenType)
             {
@@ -187,6 +198,8 @@ namespace Resto.Front.Api.CustomerScreen.View
                 {
                     case ScreenType.Welcome:
                         return LanguageSelectorTemplate;
+                    case ScreenType.Scanning:
+                        return ScanningTemplate;
                     case ScreenType.Loading:
                         return LoadingTemplate;
                     case ScreenType.Success:
@@ -208,6 +221,7 @@ namespace Resto.Front.Api.CustomerScreen.View
     public enum ScreenType
     {
         Welcome,
+        Scanning,
         Loading,
         Success,
         Error

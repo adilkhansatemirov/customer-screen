@@ -15,7 +15,7 @@
         <DataTemplate x:Key="LanguageSelectorTemplate">
             <Grid>
                 <!-- Background image -->
-                <Image Source="https://pixabay.com/get/g48bd81e37792b69c13bc7edc8ea24c554d753650395514ce01666bea6893330e43c35f193de0c99667215db2c79071748a942db11bae198c89641cfeb5ad1de0_1280.jpg"
+                <Image Source="https://pixabay.com/get/g6d70410a80dd8798d0eae3ceaa0ddf8bd1af135e10a4fe9dfc447057856d9da1356aa22b0635da85d989e2f50fd4b0ef_1280.jpg"
                Stretch="Fill"
                Panel.ZIndex="0"/>
 
@@ -61,6 +61,50 @@
             </Grid>
         </DataTemplate>
 
+        <DataTemplate x:Key="ScanningTemplate">
+            <Grid>
+                <!-- Background video placeholder -->
+                <Image Source="https://pixabay.com/get/g6d70410a80dd8798d0eae3ceaa0ddf8bd1af135e10a4fe9dfc447057856d9da1356aa22b0635da85d989e2f50fd4b0ef_1280.jpg"
+Stretch="Fill"
+Panel.ZIndex="0"/>
+
+                <Border Background="White"
+                CornerRadius="20"
+                Opacity="0.9"
+                Width="420"
+                Padding="20"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+
+                    <StackPanel>
+                        <TextBlock Text="{Binding [Scanning_Title], RelativeSource={RelativeSource AncestorType=Window}}"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           TextAlignment="Center"
+                           Margin="0,0,0,10"/>
+
+                        <TextBlock Text="{Binding [Scanning_Subtitle], RelativeSource={RelativeSource AncestorType=Window}}"
+                           FontSize="14"
+                           TextAlignment="Center"
+                           Margin="0,0,0,20"/>
+
+                        <Border Background="LightGray" Height="150" Margin="0,0,0,20">
+                            <TextBlock Text="Зона (видео)" 
+                               VerticalAlignment="Center" 
+                               HorizontalAlignment="Center"/>
+                        </Border>
+
+                        <Button Content="{Binding [Scanning_Button], RelativeSource={RelativeSource AncestorType=Window}}"
+                        Width="200" Height="40"
+                        Background="#FF8000"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        Click="ApiRequestButton_Click"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </DataTemplate>
+
         <DataTemplate x:Key="LoadingTemplate">
             <TextBlock Text="Loading..." Foreground="White" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </DataTemplate>
@@ -88,6 +132,7 @@
         <!-- Template Selector -->
         <local:ScreenTemplateSelector x:Key="ScreenSelector"
                                       LanguageSelectorTemplate="{StaticResource LanguageSelectorTemplate}"
+                                      ScanningTemplate="{StaticResource ScanningTemplate}"
                                       LoadingTemplate="{StaticResource LoadingTemplate}"
                                       ErrorTemplate="{StaticResource ErrorTemplate}"
                                       SuccessTemplate="{StaticResource SuccessTemplate}" />
