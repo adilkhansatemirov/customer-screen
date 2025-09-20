@@ -15,7 +15,7 @@
         <DataTemplate x:Key="LanguageSelectorTemplate">
             <Grid>
                 <!-- Background image -->
-                <Image Source="https://pixabay.com/get/g6d70410a80dd8798d0eae3ceaa0ddf8bd1af135e10a4fe9dfc447057856d9da1356aa22b0635da85d989e2f50fd4b0ef_1280.jpg"
+                <Image Source="/Resto.Front.Api.CustomerScreen;component/Resources/canteen.jpg"
                Stretch="Fill"
                Panel.ZIndex="0"/>
 
@@ -64,7 +64,7 @@
         <DataTemplate x:Key="ScanningTemplate">
             <Grid>
                 <!-- Background video placeholder -->
-                <Image Source="https://pixabay.com/get/g6d70410a80dd8798d0eae3ceaa0ddf8bd1af135e10a4fe9dfc447057856d9da1356aa22b0635da85d989e2f50fd4b0ef_1280.jpg"
+                <Image Source="/Resto.Front.Api.CustomerScreen;component/Resources/canteen.jpg"
 Stretch="Fill"
 Panel.ZIndex="0"/>
 
@@ -122,7 +122,7 @@ Panel.ZIndex="0"/>
                 <ListBox ItemsSource="{Binding Users, RelativeSource={RelativeSource AncestorType=Window}}" FontSize="16" Foreground="White">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding}" />
+                            <TextBlock Text="{Binding}" Foreground="Black" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

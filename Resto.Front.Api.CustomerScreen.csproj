@@ -24,6 +24,9 @@
     <PostBuildEvent />
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Resources\canteen.jpg" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Resources\CustomerScreenLocalResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -107,5 +110,8 @@
     <PackageReference Include="System.Reactive" Version="4.2.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\canteen.jpg" />
   </ItemGroup>
 </Project>
