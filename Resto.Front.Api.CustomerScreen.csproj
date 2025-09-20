@@ -25,6 +25,8 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\canteen.jpg" />
+    <None Remove="Resources\kz.png" />
+    <None Remove="Resources\ru.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\CustomerScreenLocalResources.Designer.cs">
@@ -113,5 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\canteen.jpg" />
+    <Resource Include="Resources\kz.png" />
+    <Resource Include="Resources\ru.png" />
   </ItemGroup>
 </Project>
