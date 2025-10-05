@@ -127,7 +127,7 @@ Panel.ZIndex="0"/>
                         Padding="20"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
-                    <TextBlock Text="Loading..." Foreground="White" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBlock  Text="{Binding [Loading], RelativeSource={RelativeSource AncestorType=Window}}" Foreground="Black" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
             </Grid>
         </DataTemplate>
@@ -141,7 +141,6 @@ Panel.ZIndex="0"/>
 
         <DataTemplate x:Key="SuccessTemplate">
             <Grid>
-                <!-- Background video placeholder -->
                 <Image Source="/Resto.Front.Api.CustomerScreen;component/Resources/canteen.jpg"
                        Stretch="Fill"
                        Panel.ZIndex="0"/>
@@ -152,27 +151,94 @@ Panel.ZIndex="0"/>
                         Padding="20"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
+
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Text="Request succeeded!" FontSize="24" Foreground="Green" Margin="0,0,0,20"/>
-                        <ListBox ItemsSource="{Binding Users, RelativeSource={RelativeSource AncestorType=Window}}" FontSize="16" Foreground="White">
+                        <TextBlock Text="Запрос успешно выполнен!" 
+                                   FontSize="24" 
+                                   Foreground="Green" 
+                                   Margin="0,0,0,20" 
+                                   TextAlignment="Center"/>
+                        <ListBox ItemsSource="{Binding Users, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                 FontSize="16" 
+                                 Foreground="White" 
+                                 Margin="0,0,0,20">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}" Foreground="Black" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
+
+                        <!-- Кнопки -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="Повторить сканирование"
+                                    Width="180" Height="40"
+                                    Margin="0,0,10,0"
+                                    Background="#0078D7"
+                                    Foreground="White"
+                                    FontWeight="Bold"
+                                    Click="RepeatScanButton_Click"/>
+                            <Button Content="Оплатить"
+                                    Width="180" Height="40"
+                                    Background="#28A745"
+                                    Foreground="White"
+                                    FontWeight="Bold"
+                                    Click="PayButton_Click"/>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </Grid>
         </DataTemplate>
 
-        <!-- Template Selector -->
+        <!-- Новый экран оплаты -->
+        <DataTemplate x:Key="PaymentTemplate">
+            <Grid>
+                <Image Source="/Resto.Front.Api.CustomerScreen;component/Resources/canteen.jpg"
+                       Stretch="Fill"
+                       Panel.ZIndex="0"/>
+                <Border Background="White"
+                        CornerRadius="20"
+                        Opacity="0.9"
+                        Width="420"
+                        Padding="20"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="Выберите способ оплаты" 
+                                   FontSize="22" 
+                                   FontWeight="Bold" 
+                                   Margin="0,0,0,20"
+                                   TextAlignment="Center"/>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="Kaspi"
+                                    Width="150" Height="50"
+                                    Margin="0,0,10,0"
+                                    Background="#FF8000"
+                                    Foreground="White"
+                                    FontWeight="Bold"
+                                    Click="KaspiButton_Click"/>
+
+                            <Button Content="Наличные"
+                                    Width="150" Height="50"
+                                    Background="#0078D7"
+                                    Foreground="White"
+                                    FontWeight="Bold"
+                                    Click="CashButton_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </DataTemplate>
+
         <local:ScreenTemplateSelector x:Key="ScreenSelector"
                                       LanguageSelectorTemplate="{StaticResource LanguageSelectorTemplate}"
                                       ScanningTemplate="{StaticResource ScanningTemplate}"
                                       LoadingTemplate="{StaticResource LoadingTemplate}"
                                       ErrorTemplate="{StaticResource ErrorTemplate}"
-                                      SuccessTemplate="{StaticResource SuccessTemplate}" />
+                                      SuccessTemplate="{StaticResource SuccessTemplate}"
+                                      PaymentTemplate="{StaticResource PaymentTemplate}" />
     </Window.Resources>
 
     <Grid Background="Yellow">

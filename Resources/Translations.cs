@@ -15,7 +15,8 @@ namespace Resto.Front.Api.CustomerScreen.View
                     ["Scanning_Button"] = "ПОСТАВИЛ",
                     ["Error_Title"] = "Произошла ошибка",
                     ["Error_Button"] = "Попробовать снова",
-                    ["Success_Title"] = "Запрос выполнен успешно!"
+                    ["Success_Title"] = "Запрос выполнен успешно!",
+                    ["Loading"] = "Ожидайте..",
                 },
                 [LanguageEnum.Kazakh] = new Dictionary<string, string>
                 {
@@ -25,7 +26,8 @@ namespace Resto.Front.Api.CustomerScreen.View
                     ["Scanning_Button"] = "ҚОЙДЫМ",
                     ["Error_Title"] = "Қате пайда болды",
                     ["Error_Button"] = "Қайта көру",
-                    ["Success_Title"] = "Сұраныс сәтті орындалды!"
+                    ["Success_Title"] = "Сұраныс сәтті орындалды!",
+                    ["Loading"] = "Күтіңіз..",
                 }
             };
     }

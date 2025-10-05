@@ -166,6 +166,32 @@ namespace Resto.Front.Api.CustomerScreen.View
             }
         }
 
+        private void RepeatScanButton_Click(object sender, RoutedEventArgs e)
+        {
+            PluginContext.Log.Info("Repeat scan clicked.");
+            CurrentScreen = ScreenType.Scanning;
+        }
+
+        private void PayButton_Click(object sender, RoutedEventArgs e)
+        {
+            PluginContext.Log.Info("Pay clicked.");
+            CurrentScreen = ScreenType.Payment;
+        }
+
+        private void KaspiButton_Click(object sender, RoutedEventArgs e)
+        {
+            PluginContext.Log.Info("Kaspi payment selected.");
+            MessageBox.Show("Оплата через Kaspi успешно выполнена!", "Kaspi", MessageBoxButton.OK, MessageBoxImage.Information);
+            CurrentScreen = ScreenType.Success;
+        }
+
+        private void CashButton_Click(object sender, RoutedEventArgs e)
+        {
+            PluginContext.Log.Info("Cash payment selected.");
+            MessageBox.Show("Оплата наличными успешно выполнена!", "Наличные", MessageBoxButton.OK, MessageBoxImage.Information);
+            CurrentScreen = ScreenType.Success;
+        }
+
         public class User
         {
             public int id { get; set; }
@@ -188,6 +214,7 @@ namespace Resto.Front.Api.CustomerScreen.View
         public System.Windows.DataTemplate ScanningTemplate { get; set; }
         public System.Windows.DataTemplate LoadingTemplate { get; set; }
         public System.Windows.DataTemplate SuccessTemplate { get; set; }
+        public System.Windows.DataTemplate PaymentTemplate { get; set; }
         public System.Windows.DataTemplate ErrorTemplate { get; set; }
 
         public override System.Windows.DataTemplate SelectTemplate(object item, System.Windows.DependencyObject container)
@@ -204,6 +231,8 @@ namespace Resto.Front.Api.CustomerScreen.View
                         return LoadingTemplate;
                     case ScreenType.Success:
                         return SuccessTemplate;
+                    case ScreenType.Payment:
+                        return PaymentTemplate;
                     case ScreenType.Error:
                         return ErrorTemplate;
                 }
@@ -224,6 +253,7 @@ namespace Resto.Front.Api.CustomerScreen.View
         Scanning,
         Loading,
         Success,
-        Error
+        Error,
+        Payment
     }
 }
