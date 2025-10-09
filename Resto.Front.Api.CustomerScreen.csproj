@@ -11,23 +11,25 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <PostBuildEvent />
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
+
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent />
-  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="Resources\canteen.jpg" />
     <None Remove="Resources\kz.png" />
     <None Remove="Resources\ru.png" />
   </ItemGroup>
+
   <ItemGroup>
     <Compile Update="Resources\CustomerScreenLocalResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -47,6 +49,7 @@
       <DependentUpon>CustomerScreenWindow.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
+
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -55,38 +58,30 @@
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
+
   <ItemGroup>
     <Page Include="Resources\CustomerResourceDictionary.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\Controls\CustomerMediaControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\Controls\CustomerOrderItemsControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\Controls\CustomerResultSumControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\CustomerScreenWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Update="Resources\CustomerScreenLocalResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
@@ -94,25 +89,34 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <PrivateAssets>all</PrivateAssets>
+      <RestoPluginApi>true</RestoPluginApi>
     </PackageReference>
     <PackageReference Include="Microsoft.Net.Http" Version="2.2.29">
       <PrivateAssets>all</PrivateAssets>
+      <RestoPluginApi>true</RestoPluginApi>
     </PackageReference>
     <PackageReference Include="Resto.Front.Api.PluginPackaging" Version="1.0.29">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <RestoPluginApi>true</RestoPluginApi>
     </PackageReference>
-    <PackageReference Include="Resto.Front.Api.V8" Version="8.7.6032" />
+    <PackageReference Include="Resto.Front.Api.V8" Version="8.7.6032">
+      <RestoPluginApi>true</RestoPluginApi>
+    </PackageReference>
     <PackageReference Include="WMPLib" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
+      <RestoPluginApi>true</RestoPluginApi>
     </PackageReference>
     <PackageReference Include="System.Reactive" Version="4.2.0">
       <PrivateAssets>all</PrivateAssets>
+      <RestoPluginApi>true</RestoPluginApi>
     </PackageReference>
   </ItemGroup>
+
   <ItemGroup>
     <Resource Include="Resources\canteen.jpg" />
     <Resource Include="Resources\kz.png" />

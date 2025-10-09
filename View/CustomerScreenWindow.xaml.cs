@@ -178,18 +178,24 @@ namespace Resto.Front.Api.CustomerScreen.View
             CurrentScreen = ScreenType.Payment;
         }
 
-        private void KaspiButton_Click(object sender, RoutedEventArgs e)
+        private async void KaspiButton_Click(object sender, RoutedEventArgs e)
         {
-            PluginContext.Log.Info("Kaspi payment selected.");
-            MessageBox.Show("Оплата через Kaspi успешно выполнена!", "Kaspi", MessageBoxButton.OK, MessageBoxImage.Information);
-            CurrentScreen = ScreenType.Success;
+            //PluginContext.Log.Info("Kaspi payment selected.");
+            //MessageBox.Show("Оплата через Kaspi успешно выполнена!", "Kaspi", MessageBoxButton.OK, MessageBoxImage.Information);
+            await Task.Delay(1000); // short delay to simulate processing
+            CurrentScreen = ScreenType.Final;
+            await Task.Delay(1000);
+            CurrentScreen = ScreenType.Welcome;
         }
 
-        private void CashButton_Click(object sender, RoutedEventArgs e)
+        private async void CashButton_Click(object sender, RoutedEventArgs e)
         {
-            PluginContext.Log.Info("Cash payment selected.");
-            MessageBox.Show("Оплата наличными успешно выполнена!", "Наличные", MessageBoxButton.OK, MessageBoxImage.Information);
-            CurrentScreen = ScreenType.Success;
+            //PluginContext.Log.Info("Cash payment selected.");
+            //MessageBox.Show("Оплата наличными успешно выполнена!", "Наличные", MessageBoxButton.OK, MessageBoxImage.Information);
+            await Task.Delay(1000);
+            CurrentScreen = ScreenType.Final;
+            await Task.Delay(1000);
+            CurrentScreen = ScreenType.Welcome;
         }
 
         public class User
@@ -216,6 +222,7 @@ namespace Resto.Front.Api.CustomerScreen.View
         public System.Windows.DataTemplate SuccessTemplate { get; set; }
         public System.Windows.DataTemplate PaymentTemplate { get; set; }
         public System.Windows.DataTemplate ErrorTemplate { get; set; }
+        public System.Windows.DataTemplate FinalTemplate { get; set; }
 
         public override System.Windows.DataTemplate SelectTemplate(object item, System.Windows.DependencyObject container)
         {
@@ -235,6 +242,8 @@ namespace Resto.Front.Api.CustomerScreen.View
                         return PaymentTemplate;
                     case ScreenType.Error:
                         return ErrorTemplate;
+                    case ScreenType.Final:
+                        return FinalTemplate;
                 }
             }
             return base.SelectTemplate(item, container);
@@ -254,6 +263,7 @@ namespace Resto.Front.Api.CustomerScreen.View
         Loading,
         Success,
         Error,
-        Payment
+        Payment,
+        Final
     }
 }
