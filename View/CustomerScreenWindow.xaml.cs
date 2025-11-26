@@ -1,6 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Resto.Front.Api.Data.Assortment;
+using Resto.Front.Api.Data.Orders;
+using Resto.Front.Api.Data.Payments;
 using Resto.Front.Api.Editors;
+using Resto.Front.Api.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,6 +18,7 @@ namespace Resto.Front.Api.CustomerScreen.View
     public partial class CustomerScreenWindow : Window, INotifyPropertyChanged
     {
         public bool CanBeClosed = false;
+        private IOrder currentOrder;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -27,6 +31,12 @@ namespace Resto.Front.Api.CustomerScreen.View
                 currentScreen = value;
                 PluginContext.Log.Info("CurrentScreen set to: " + currentScreen);
                 OnPropertyChanged(nameof(CurrentScreen));
+                
+                // Show payment types popup when entering payment screen
+                if (currentScreen == ScreenType.Payment)
+                {
+                    ShowPaymentTypesPopup();
+                }
             }
         }
 
@@ -50,6 +60,28 @@ namespace Resto.Front.Api.CustomerScreen.View
             {
                 users = value;
                 OnPropertyChanged(nameof(Users));
+            }
+        }
+
+        private List<IProduct> dishes;
+        public List<IProduct> Dishes
+        {
+            get => dishes;
+            set
+            {
+                dishes = value;
+                OnPropertyChanged(nameof(Dishes));
+            }
+        }
+
+        private ObservableCollection<IProduct> orderDishes;
+        public ObservableCollection<IProduct> OrderDishes
+        {
+            get => orderDishes;
+            set
+            {
+                orderDishes = value;
+                OnPropertyChanged(nameof(OrderDishes));
             }
         }
 
@@ -86,6 +118,7 @@ namespace Resto.Front.Api.CustomerScreen.View
             InitializeComponent();
             DataContext = this;
             CurrentScreen = ScreenType.Welcome;
+            OrderDishes = null; // Initialize as null - will be set only after random selection
             PluginContext.Log.Info("Set screen to: " + CurrentScreen);
         }
 
@@ -136,15 +169,72 @@ namespace Resto.Front.Api.CustomerScreen.View
             try
             {
                 await MakeApiRequestAsync();
-                CurrentScreen = ScreenType.Success;
+                
+                // Clear OrderDishes initially - don't show all dishes
+                OrderDishes = null;
+                
                 var credentials = PluginContext.Operations.GetDefaultCredentials();
                 var editSession = PluginContext.Operations.CreateEditSession();
                 var newOrder = editSession.CreateOrder(null);
                 editSession.ChangeOrderOriginName("Customer Screen", newOrder);
                 var guest1 = editSession.AddOrderGuest("Bratishka", newOrder);
-                var firstProduct = PluginContext.Operations.GetActiveProducts().FirstOrDefault();
-                editSession.AddOrderProductItem(2m, firstProduct, newOrder, guest1, null);
+                
+                // Use dishes from MakeApiRequestAsync
+                var allProducts = Dishes;
+                
+                if (allProducts == null || allProducts.Count == 0)
+                {
+                    PluginContext.Log.Info("No products available in menu");
+                    ErrorMessage = "No products available in menu";
+                    CurrentScreen = ScreenType.Error;
+                    return;
+                }
+                
+                // Select 4 random products
+                var random = new Random();
+                var selectedProducts = allProducts.OrderBy(x => random.Next()).Take(4).ToList();
+                
+                // Store ONLY the randomly selected dishes for UI display (not all dishes)
+                OrderDishes = new ObservableCollection<IProduct>(selectedProducts);
+                
+                CurrentScreen = ScreenType.Success;
+                
+                // Add products to order (some with modifiers, some without)
+                // for (int i = 0; i < selectedProducts.Count; i++)
+                // {
+                //     var product = selectedProducts[i];
+                //     var size = product.Scale?.DefaultSize;
+                //     var productStub = editSession.AddOrderProductItem(1m, product, newOrder, guest1, size);
+                    
+                //     // Add modifiers to every other product (products at index 0 and 2 will have modifiers)
+                //     if (i % 2 == 0)
+                //     {
+                //         // Add simple modifiers
+                //         var simpleModifiers = product.GetSimpleModifiers(null)
+                //             .Where(x => x.DefaultAmount != 0)
+                //             .Take(2); // Limit to 2 modifiers per product
+                //         foreach (var modifier in simpleModifiers)
+                //         {
+                //             editSession.AddOrderModifierItem(modifier.DefaultAmount, modifier.Product, null, newOrder, productStub);
+                //         }
+                        
+                //         // Add group modifiers
+                //         var groupModifiers = product.GetGroupModifiers(null);
+                //         foreach (var groupModifier in groupModifiers)
+                //         {
+                //             var itemsToAdd = groupModifier.Items
+                //                 .Where(x => x.DefaultAmount != 0)
+                //                 .Take(1); // Add one item from each group
+                //             foreach (var item in itemsToAdd)
+                //             {
+                //                 editSession.AddOrderModifierItem(item.DefaultAmount, item.Product, groupModifier.ProductGroup, newOrder, productStub);
+                //             }
+                //         }
+                //     }
+                // }
+                
                 var result = PluginContext.Operations.SubmitChanges(editSession, credentials);
+                currentOrder = result.Get(newOrder);
             }
             catch (Exception ex)
             {
@@ -156,14 +246,12 @@ namespace Resto.Front.Api.CustomerScreen.View
 
         private async Task MakeApiRequestAsync()
         {
-            using (var httpClient = new HttpClient())
-            {
-                httpClient.DefaultRequestHeaders.Add("x-api-key", "reqres-free-v1");
-                var url = "https://reqres.in/api/users?page=1";
-                var response = await httpClient.GetStringAsync(url);
-                var users = JsonConvert.DeserializeObject<UserResponse>(response);
-                Users = new ObservableCollection<User>(users.data);
-            }
+            // Get all active products (dishes) from menu
+            var allProducts = PluginContext.Operations.GetActiveProducts()
+                .Where(p => p.Type == ProductType.Dish && p.Template == null)
+                .ToList();
+            
+            Dishes = allProducts;
         }
 
         private void RepeatScanButton_Click(object sender, RoutedEventArgs e)
@@ -176,6 +264,31 @@ namespace Resto.Front.Api.CustomerScreen.View
         {
             PluginContext.Log.Info("Pay clicked.");
             CurrentScreen = ScreenType.Payment;
+            // Popup will be shown automatically via CurrentScreen setter
+        }
+
+        private void ShowPaymentTypesPopup()
+        {
+            try
+            {
+                var paymentTypes = PluginContext.Operations.GetPaymentTypes().ToList();
+                
+                if (paymentTypes.Count == 0)
+                {
+                    MessageBox.Show("No payment types available.", "Payment Types", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                var paymentTypesList = string.Join("\n", paymentTypes.Select(pt => 
+                    $"- {pt.Name} ({pt.Kind})"));
+                
+                var message = $"Available Payment Types:\n\n{paymentTypesList}";
+                MessageBox.Show(message, "Payment Types", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                PluginContext.Log.Info("Error showing payment types popup: " + ex.Message);
+            }
         }
 
         private async void KaspiButton_Click(object sender, RoutedEventArgs e)
@@ -183,6 +296,84 @@ namespace Resto.Front.Api.CustomerScreen.View
             //PluginContext.Log.Info("Kaspi payment selected.");
             //MessageBox.Show("Оплата через Kaspi успешно выполнена!", "Kaspi", MessageBoxButton.OK, MessageBoxImage.Information);
             await Task.Delay(1000); // short delay to simulate processing
+            
+            // Close/complete the order with payment (emulating Guest Bill button)
+            if (currentOrder != null)
+            {
+                try
+                {
+                    var credentials = PluginContext.Operations.GetDefaultCredentials();
+                    // Refresh order to get latest state
+                    currentOrder = PluginContext.Operations.GetOrderById(currentOrder.Id);
+                    
+                    // Step 0: Print all order items before billing (required for bill cheque)
+                    var itemsToPrint = currentOrder.Items.OfType<IOrderCookingItem>().ToList();
+                    if (itemsToPrint.Count > 0)
+                    {
+                        PluginContext.Operations.PrintOrderItems(currentOrder, itemsToPrint, credentials);
+                    }
+                    
+                    // Step 1: Bill the order first (like Guest Bill button)
+                    PluginContext.Operations.BillOrder(currentOrder, 0, credentials);
+                    
+                    // Refresh order after billing
+                    currentOrder = PluginContext.Operations.GetOrderById(currentOrder.Id);
+                    
+                    // Step 2: Get Kaspi payment type (try to find by name, or use Card type)
+                    var paymentType = PluginContext.Operations.GetPaymentTypes()
+                        .FirstOrDefault(x => x.Name.ToUpper().Contains("KASPI") || 
+                                            (x.Kind == PaymentTypeKind.Card && x.Name.ToUpper().Contains("CARD"))) 
+                        ?? PluginContext.Operations.GetPaymentTypes().FirstOrDefault(x => x.Kind == PaymentTypeKind.Card);
+                    
+                    if (paymentType == null)
+                    {
+                        PluginContext.Log.Info("No card payment type found, using first available payment type");
+                        paymentType = PluginContext.Operations.GetPaymentTypes().FirstOrDefault();
+                    }
+                    
+                    if (paymentType != null)
+                    {
+                        // Step 3: Add payment item for the full order amount
+                        PluginContext.Operations.AddPaymentItem(
+                            currentOrder.ResultSum, 
+                            null, // or CardPaymentItemAdditionalData if needed
+                            paymentType, 
+                            currentOrder, 
+                            credentials);
+                        
+                        // Refresh order after adding payment
+                        currentOrder = PluginContext.Operations.GetOrderById(currentOrder.Id);
+                        
+                        // Step 4: Pay the order and pay out on user (marks as paid/closed)
+                        PluginContext.Operations.PayOrderAndPayOutOnUser(currentOrder, true, paymentType, currentOrder.ResultSum, credentials);
+                        
+                        // Step 5: Refresh order to get updated status (should be Closed)
+                        currentOrder = PluginContext.Operations.GetOrderById(currentOrder.Id);
+                        
+                        // Verify order is closed
+                        if (currentOrder.Status == OrderStatus.Closed)
+                        {
+                            PluginContext.Log.Info($"Order billed, paid and completed after Kaspi payment. Status: {currentOrder.Status}");
+                        }
+                        else
+                        {
+                            PluginContext.Log.Info($"Order payment processed but status is {currentOrder.Status}, expected Closed");
+                        }
+                    }
+                    else
+                    {
+                        PluginContext.Log.Info("No payment types available");
+                    }
+                    
+                    currentOrder = null;
+                    OrderDishes = null; // Clear order dishes
+                }
+                catch (Exception ex)
+                {
+                    PluginContext.Log.Info("Error processing Kaspi payment: " + ex.Message);
+                }
+            }
+            
             CurrentScreen = ScreenType.Final;
             await Task.Delay(1000);
             CurrentScreen = ScreenType.Welcome;
@@ -193,6 +384,82 @@ namespace Resto.Front.Api.CustomerScreen.View
             //PluginContext.Log.Info("Cash payment selected.");
             //MessageBox.Show("Оплата наличными успешно выполнена!", "Наличные", MessageBoxButton.OK, MessageBoxImage.Information);
             await Task.Delay(1000);
+            
+            // Close/complete the order with payment (emulating Guest Bill button)
+            if (currentOrder != null)
+            {
+                try
+                {
+                    var credentials = PluginContext.Operations.GetDefaultCredentials();
+                    // Refresh order to get latest state
+                    currentOrder = PluginContext.Operations.GetOrderById(currentOrder.Id);
+                    
+                    // Step 0: Print all order items before billing (required for bill cheque)
+                    var itemsToPrint = currentOrder.Items.OfType<IOrderCookingItem>().ToList();
+                    if (itemsToPrint.Count > 0)
+                    {
+                        PluginContext.Operations.PrintOrderItems(currentOrder, itemsToPrint, credentials);
+                    }
+                    
+                    // Step 1: Bill the order first (like Guest Bill button)
+                    PluginContext.Operations.BillOrder(currentOrder, 0, credentials);
+                    
+                    // Refresh order after billing
+                    currentOrder = PluginContext.Operations.GetOrderById(currentOrder.Id);
+                    
+                    // Step 2: Get cash payment type
+                    var paymentType = PluginContext.Operations.GetPaymentTypes()
+                        .FirstOrDefault(x => x.Kind == PaymentTypeKind.Cash);
+                    
+                    if (paymentType == null)
+                    {
+                        PluginContext.Log.Info("No cash payment type found, using first available payment type");
+                        paymentType = PluginContext.Operations.GetPaymentTypes().FirstOrDefault();
+                    }
+                    
+                    if (paymentType != null)
+                    {
+                        // Step 3: Add payment item for the full order amount
+                        PluginContext.Operations.AddPaymentItem(
+                            currentOrder.ResultSum, 
+                            null, 
+                            paymentType, 
+                            currentOrder, 
+                            credentials);
+                        
+                        // Refresh order after adding payment
+                        currentOrder = PluginContext.Operations.GetOrderById(currentOrder.Id);
+                        
+                        // Step 4: Pay the order and pay out on user (marks as paid/closed)
+                        PluginContext.Operations.PayOrderAndPayOutOnUser(currentOrder, true, paymentType, currentOrder.ResultSum, credentials);
+                        
+                        // Step 5: Refresh order to get updated status (should be Closed)
+                        currentOrder = PluginContext.Operations.GetOrderById(currentOrder.Id);
+                        
+                        // Verify order is closed
+                        if (currentOrder.Status == OrderStatus.Closed)
+                        {
+                            PluginContext.Log.Info($"Order billed, paid and completed after Cash payment. Status: {currentOrder.Status}");
+                        }
+                        else
+                        {
+                            PluginContext.Log.Info($"Order payment processed but status is {currentOrder.Status}, expected Closed");
+                        }
+                    }
+                    else
+                    {
+                        PluginContext.Log.Info("No payment types available");
+                    }
+                    
+                    currentOrder = null;
+                    OrderDishes = null; // Clear order dishes
+                }
+                catch (Exception ex)
+                {
+                    PluginContext.Log.Info("Error processing Cash payment: " + ex.Message);
+                }
+            }
+            
             CurrentScreen = ScreenType.Final;
             await Task.Delay(1000);
             CurrentScreen = ScreenType.Welcome;

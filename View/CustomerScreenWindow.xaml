@@ -158,13 +158,21 @@ Panel.ZIndex="0"/>
                                    Foreground="Green" 
                                    Margin="0,0,0,20" 
                                    TextAlignment="Center"/>
-                        <ListBox ItemsSource="{Binding Users, RelativeSource={RelativeSource AncestorType=Window}}" 
+                        <TextBlock Text="Добавленные блюда:" 
+                                   FontSize="18" 
+                                   FontWeight="Bold"
+                                   Foreground="Black" 
+                                   Margin="0,0,0,10" 
+                                   TextAlignment="Center"/>
+                        <ListBox ItemsSource="{Binding OrderDishes, RelativeSource={RelativeSource AncestorType=Window}}" 
                                  FontSize="16" 
-                                 Foreground="White" 
-                                 Margin="0,0,0,20">
+                                 Foreground="Black" 
+                                 Margin="0,0,0,20"
+                                 MaxHeight="200"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding}" Foreground="Black" />
+                                    <TextBlock Text="{Binding Name}" Foreground="Black" Margin="5" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
@@ -208,8 +216,29 @@ Panel.ZIndex="0"/>
                         <TextBlock Text="Выберите способ оплаты" 
                                    FontSize="22" 
                                    FontWeight="Bold" 
-                                   Margin="0,0,0,20"
+                                   Margin="0,0,0,10"
                                    TextAlignment="Center"/>
+                        
+                        <TextBlock Text="Блюда в заказе:" 
+                                   FontSize="16" 
+                                   FontWeight="Bold"
+                                   Foreground="Black" 
+                                   Margin="0,0,0,5" 
+                                   TextAlignment="Center"/>
+                        <ListBox ItemsSource="{Binding OrderDishes, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                 FontSize="14" 
+                                 Foreground="Black" 
+                                 Margin="0,0,0,15"
+                                 MaxHeight="150"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 BorderThickness="1"
+                                 BorderBrush="LightGray">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" Foreground="Black" Margin="5" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Button Content="Kaspi"
