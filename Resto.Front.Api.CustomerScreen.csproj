@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <None Remove="Resources\canteen.jpg" />
+    <None Remove="Resources\correct_scan.jpg" />
     <None Remove="Resources\kz.png" />
     <None Remove="Resources\ru.png" />
   </ItemGroup>
@@ -119,6 +120,7 @@
 
   <ItemGroup>
     <Resource Include="Resources\canteen.jpg" />
+    <Resource Include="Resources\correct_scan.jpg" />
     <Resource Include="Resources\kz.png" />
     <Resource Include="Resources\ru.png" />
   </ItemGroup>

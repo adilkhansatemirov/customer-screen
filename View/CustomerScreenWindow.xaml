@@ -21,47 +21,49 @@
 
                 <!-- Overlay content -->
                 <Border Background="White"
-                CornerRadius="20"
+                CornerRadius="60"
                 Opacity="0.9"
-                Width="420"
-                Padding="20"
+                Width="1260"
+                Padding="60"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
 
                     <StackPanel>
                         <TextBlock Text="КАССА САМООБСЛУЖИВАНИЯ" 
-                           FontSize="24"
+                           FontSize="72"
                            FontWeight="Bold" 
                            Foreground="Black"
                            TextAlignment="Center"
-                           Margin="0,0,0,20"/>
+                           Margin="0,0,0,60"/>
 
                         <!-- Buttons side-by-side -->
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Width="180" Height="40"
-                                    Margin="0,0,10,0"
+                            <Button Width="540" Height="120"
+                                    Margin="0,0,30,0"
                                     Click="RussianLanguageButton_Click"
                                     BorderThickness="0"
                                     Background="#0078D7"
                                     Foreground="White"
-                                    FontWeight="Bold">
+                                    FontWeight="Bold"
+                                    FontSize="36">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Image Source="/Resto.Front.Api.CustomerScreen;component/Resources/ru.png"
-               Width="20" Height="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="РУССКИЙ ЯЗЫК" VerticalAlignment="Center"/>
+               Width="60" Height="60" Margin="0,0,24,0"/>
+                                    <TextBlock Text="РУССКИЙ ЯЗЫК" VerticalAlignment="Center" FontSize="36"/>
                                 </StackPanel>
                             </Button>
 
-                            <Button Width="180" Height="40"
+                            <Button Width="540" Height="120"
                                     Click="KazakhLanguageButton_Click"
                                     BorderThickness="0"
                                     Background="#28A745"
                                     Foreground="White"
-                                    FontWeight="Bold">
+                                    FontWeight="Bold"
+                                    FontSize="36">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Image Source="/Resto.Front.Api.CustomerScreen;component/Resources/kz.png"
-               Width="20" Height="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="ҚАЗАҚ ТІЛІ" VerticalAlignment="Center"/>
+               Width="60" Height="60" Margin="0,0,24,0"/>
+                                    <TextBlock Text="ҚАЗАҚ ТІЛІ" VerticalAlignment="Center" FontSize="36"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -78,36 +80,38 @@ Stretch="Fill"
 Panel.ZIndex="0"/>
 
                 <Border Background="White"
-                CornerRadius="20"
+                CornerRadius="60"
                 Opacity="0.9"
-                Width="420"
-                Padding="20"
+                Width="1260"
+                Padding="60"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
 
                     <StackPanel>
                         <TextBlock Text="{Binding [Scanning_Title], RelativeSource={RelativeSource AncestorType=Window}}"
-                           FontSize="20"
+                           FontSize="60"
                            FontWeight="Bold"
                            TextAlignment="Center"
-                           Margin="0,0,0,10"/>
+                           Margin="0,0,0,30"/>
 
                         <TextBlock Text="{Binding [Scanning_Subtitle], RelativeSource={RelativeSource AncestorType=Window}}"
-                           FontSize="14"
+                           FontSize="42"
                            TextAlignment="Center"
-                           Margin="0,0,0,20"/>
+                           Margin="0,0,0,60"/>
 
-                        <Border Background="LightGray" Height="150" Margin="0,0,0,20">
-                            <TextBlock Text="Зона (видео)" 
-                               VerticalAlignment="Center" 
-                               HorizontalAlignment="Center"/>
+                        <Border Background="LightGray" Height="450" Margin="0,0,0,60">
+                            <Image Source="/Resto.Front.Api.CustomerScreen;component/Resources/correct_scan.jpg"
+                                   Stretch="Uniform"
+                                   VerticalAlignment="Center" 
+                                   HorizontalAlignment="Center"/>
                         </Border>
 
                         <Button Content="{Binding [Scanning_Button], RelativeSource={RelativeSource AncestorType=Window}}"
-                        Width="200" Height="40"
+                        Width="600" Height="120"
                         Background="#FF8000"
                         Foreground="White"
                         FontWeight="Bold"
+                        FontSize="36"
                         Click="ApiRequestButton_Click"/>
                     </StackPanel>
                 </Border>
@@ -121,21 +125,21 @@ Panel.ZIndex="0"/>
                        Stretch="Fill"
                        Panel.ZIndex="0"/>
                 <Border Background="White"
-                        CornerRadius="20"
+                        CornerRadius="60"
                         Opacity="0.9"
-                        Width="420"
-                        Padding="20"
+                        Width="1260"
+                        Padding="60"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
-                    <TextBlock  Text="{Binding [Loading], RelativeSource={RelativeSource AncestorType=Window}}" Foreground="Black" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBlock  Text="{Binding [Loading], RelativeSource={RelativeSource AncestorType=Window}}" Foreground="Black" FontSize="72" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
             </Grid>
         </DataTemplate>
 
         <DataTemplate x:Key="ErrorTemplate">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock Text="Oops! Something went wrong." Foreground="Red" FontSize="24" />
-                <Button Content="Try Again" Width="200" Height="40" Click="ApiRequestButton_Click" />
+                <TextBlock Text="Oops! Something went wrong." Foreground="Red" FontSize="72" Margin="0,0,0,60" />
+                <Button Content="Try Again" Width="600" Height="120" FontSize="36" Click="ApiRequestButton_Click" />
             </StackPanel>
         </DataTemplate>
 
@@ -145,34 +149,34 @@ Panel.ZIndex="0"/>
                        Stretch="Fill"
                        Panel.ZIndex="0"/>
                 <Border Background="White"
-                        CornerRadius="20"
+                        CornerRadius="60"
                         Opacity="0.9"
-                        Width="420"
-                        Padding="20"
+                        Width="1260"
+                        Padding="60"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
 
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Text="Запрос успешно выполнен!" 
-                                   FontSize="24" 
+                                   FontSize="72" 
                                    Foreground="Green" 
-                                   Margin="0,0,0,20" 
+                                   Margin="0,0,0,60" 
                                    TextAlignment="Center"/>
                         <TextBlock Text="Добавленные блюда:" 
-                                   FontSize="18" 
+                                   FontSize="54" 
                                    FontWeight="Bold"
                                    Foreground="Black" 
-                                   Margin="0,0,0,10" 
+                                   Margin="0,0,0,30" 
                                    TextAlignment="Center"/>
                         <ListBox ItemsSource="{Binding OrderDishes, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                 FontSize="16" 
+                                 FontSize="48" 
                                  Foreground="Black" 
-                                 Margin="0,0,0,20"
-                                 MaxHeight="200"
+                                 Margin="0,0,0,60"
+                                 MaxHeight="600"
                                  ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Name}" Foreground="Black" Margin="5" />
+                                    <TextBlock Text="{Binding Name}" Foreground="Black" Margin="15" FontSize="48" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
@@ -180,17 +184,19 @@ Panel.ZIndex="0"/>
                         <!-- Кнопки -->
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Button Content="Повторить сканирование"
-                                    Width="180" Height="40"
-                                    Margin="0,0,10,0"
+                                    Width="540" Height="120"
+                                    Margin="0,0,30,0"
                                     Background="#0078D7"
                                     Foreground="White"
                                     FontWeight="Bold"
+                                    FontSize="36"
                                     Click="RepeatScanButton_Click"/>
                             <Button Content="Оплатить"
-                                    Width="180" Height="40"
+                                    Width="540" Height="120"
                                     Background="#28A745"
                                     Foreground="White"
                                     FontWeight="Bold"
+                                    FontSize="36"
                                     Click="PayButton_Click"/>
                         </StackPanel>
                     </StackPanel>
@@ -205,55 +211,57 @@ Panel.ZIndex="0"/>
                        Stretch="Fill"
                        Panel.ZIndex="0"/>
                 <Border Background="White"
-                        CornerRadius="20"
+                        CornerRadius="60"
                         Opacity="0.9"
-                        Width="420"
-                        Padding="20"
+                        Width="1260"
+                        Padding="60"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
 
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Text="Выберите способ оплаты" 
-                                   FontSize="22" 
+                                   FontSize="66" 
                                    FontWeight="Bold" 
-                                   Margin="0,0,0,10"
+                                   Margin="0,0,0,30"
                                    TextAlignment="Center"/>
                         
                         <TextBlock Text="Блюда в заказе:" 
-                                   FontSize="16" 
+                                   FontSize="48" 
                                    FontWeight="Bold"
                                    Foreground="Black" 
-                                   Margin="0,0,0,5" 
+                                   Margin="0,0,0,15" 
                                    TextAlignment="Center"/>
                         <ListBox ItemsSource="{Binding OrderDishes, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                 FontSize="14" 
+                                 FontSize="42" 
                                  Foreground="Black" 
-                                 Margin="0,0,0,15"
-                                 MaxHeight="150"
+                                 Margin="0,0,0,45"
+                                 MaxHeight="450"
                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                 BorderThickness="1"
+                                 BorderThickness="3"
                                  BorderBrush="LightGray">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Name}" Foreground="Black" Margin="5" />
+                                    <TextBlock Text="{Binding Name}" Foreground="Black" Margin="15" FontSize="42" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Button Content="Kaspi"
-                                    Width="150" Height="50"
-                                    Margin="0,0,10,0"
+                                    Width="450" Height="150"
+                                    Margin="0,0,30,0"
                                     Background="#FF8000"
                                     Foreground="White"
                                     FontWeight="Bold"
+                                    FontSize="36"
                                     Click="KaspiButton_Click"/>
 
                             <Button Content="Наличные"
-                                    Width="150" Height="50"
+                                    Width="450" Height="150"
                                     Background="#0078D7"
                                     Foreground="White"
                                     FontWeight="Bold"
+                                    FontSize="36"
                                     Click="CashButton_Click"/>
                         </StackPanel>
                     </StackPanel>
@@ -268,20 +276,20 @@ Panel.ZIndex="0"/>
                Panel.ZIndex="0"/>
 
                 <Border Background="White"
-                CornerRadius="20"
+                CornerRadius="60"
                 Opacity="0.9"
-                Width="420"
-                Padding="20"
+                Width="1260"
+                Padding="60"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
 
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Text="Спасибо за оплату!" 
-                           FontSize="26" 
+                           FontSize="78" 
                            FontWeight="Bold" 
                            Foreground="Green" 
                            TextAlignment="Center"
-                           Margin="0,0,0,10"/>
+                           Margin="0,0,0,30"/>
                     </StackPanel>
                 </Border>
             </Grid>

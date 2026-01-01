@@ -275,7 +275,7 @@ namespace Resto.Front.Api.CustomerScreen.View
                 
                 if (paymentTypes.Count == 0)
                 {
-                    MessageBox.Show("No payment types available.", "Payment Types", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // MessageBox.Show("No payment types available.", "Payment Types", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }
 
@@ -283,7 +283,7 @@ namespace Resto.Front.Api.CustomerScreen.View
                     $"- {pt.Name} ({pt.Kind})"));
                 
                 var message = $"Available Payment Types:\n\n{paymentTypesList}";
-                MessageBox.Show(message, "Payment Types", MessageBoxButton.OK, MessageBoxImage.Information);
+                // MessageBox.Show(message, "Payment Types", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
