@@ -99,14 +99,14 @@ Panel.ZIndex="0"/>
                            TextAlignment="Center"
                            Margin="0,0,0,60"/>
 
-						<Border Background="LightGray" Height="450" Margin="0,0,0,60">
-							<Image Source="/Resto.Front.Api.CustomerScreen;component/Resources/correct_scan.jpg"
+                        <Border Background="LightGray" Height="450" Margin="0,0,0,60">
+                            <Image Source="/Resto.Front.Api.CustomerScreen;component/Resources/correct_scan.jpg"
                                    Stretch="Uniform"
-                                   VerticalAlignment="Center"
+                                   VerticalAlignment="Center" 
                                    HorizontalAlignment="Center"/>
-						</Border>
+                        </Border>
 
-						<Button Content="{Binding [Scanning_Button], RelativeSource={RelativeSource AncestorType=Window}}"
+                        <Button Content="{Binding [Scanning_Button], RelativeSource={RelativeSource AncestorType=Window}}"
                         Width="600" Height="120"
                         Background="#FF8000"
                         Foreground="White"
@@ -138,8 +138,8 @@ Panel.ZIndex="0"/>
 
         <DataTemplate x:Key="ErrorTemplate">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock Text="{Binding [Error_Title], RelativeSource={RelativeSource AncestorType=Window}}" Foreground="Red" FontSize="72" Margin="0,0,0,60" />
-                <Button Content="{Binding [Button], RelativeSource={RelativeSource AncestorType=Window}}" Width="600" Height="120" FontSize="36" Click="ApiRequestButton_Click" />
+                <TextBlock Text="Oops! Something went wrong." Foreground="Red" FontSize="72" Margin="0,0,0,60" />
+                <Button Content="Try Again" Width="600" Height="120" FontSize="36" Click="ApiRequestButton_Click" />
             </StackPanel>
         </DataTemplate>
 
@@ -157,12 +157,12 @@ Panel.ZIndex="0"/>
                         VerticalAlignment="Center">
 
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding [Success_Title], RelativeSource={RelativeSource AncestorType=Window}}" 
+                        <TextBlock Text="Запрос успешно выполнен!" 
                                    FontSize="72" 
                                    Foreground="Green" 
                                    Margin="0,0,0,60" 
                                    TextAlignment="Center"/>
-                        <TextBlock Text="{Binding [Success_AddedDishes], RelativeSource={RelativeSource AncestorType=Window}}" 
+                        <TextBlock Text="Добавленные блюда:" 
                                    FontSize="54" 
                                    FontWeight="Bold"
                                    Foreground="Black" 
@@ -183,7 +183,7 @@ Panel.ZIndex="0"/>
 
                         <!-- Кнопки -->
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Content="{Binding [Repeat_Scan], RelativeSource={RelativeSource AncestorType=Window}}"
+                            <Button Content="Повторить сканирование"
                                     Width="540" Height="120"
                                     Margin="0,0,30,0"
                                     Background="#0078D7"
@@ -191,7 +191,7 @@ Panel.ZIndex="0"/>
                                     FontWeight="Bold"
                                     FontSize="36"
                                     Click="RepeatScanButton_Click"/>
-                            <Button Content="{Binding [Pay], RelativeSource={RelativeSource AncestorType=Window}}"
+                            <Button Content="Оплатить"
                                     Width="540" Height="120"
                                     Background="#28A745"
                                     Foreground="White"
@@ -219,13 +219,13 @@ Panel.ZIndex="0"/>
                         VerticalAlignment="Center">
 
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding [Payment_Title], RelativeSource={RelativeSource AncestorType=Window}}" 
+                        <TextBlock Text="Выберите способ оплаты" 
                                    FontSize="66" 
                                    FontWeight="Bold" 
                                    Margin="0,0,0,30"
                                    TextAlignment="Center"/>
                         
-                        <TextBlock Text="{Binding [Payment_Dishes], RelativeSource={RelativeSource AncestorType=Window}}" 
+                        <TextBlock Text="Блюда в заказе:" 
                                    FontSize="48" 
                                    FontWeight="Bold"
                                    Foreground="Black" 
@@ -256,7 +256,7 @@ Panel.ZIndex="0"/>
                                     FontSize="36"
                                     Click="KaspiButton_Click"/>
 
-                            <Button Content="{Binding [Payment_Cash], RelativeSource={RelativeSource AncestorType=Window}}"
+                            <Button Content="Наличные"
                                     Width="450" Height="150"
                                     Background="#0078D7"
                                     Foreground="White"
@@ -284,7 +284,7 @@ Panel.ZIndex="0"/>
                 VerticalAlignment="Center">
 
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding [Thanks], RelativeSource={RelativeSource AncestorType=Window}}" 
+                        <TextBlock Text="Спасибо за оплату!" 
                            FontSize="78" 
                            FontWeight="Bold" 
                            Foreground="Green" 
