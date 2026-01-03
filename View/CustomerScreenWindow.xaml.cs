@@ -23,6 +23,7 @@ namespace Resto.Front.Api.CustomerScreen.View
         public event PropertyChangedEventHandler PropertyChanged;
 
         private ScreenType currentScreen = ScreenType.Welcome;
+
         public ScreenType CurrentScreen
         {
             get => currentScreen;
