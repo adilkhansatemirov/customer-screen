@@ -4,6 +4,7 @@ using Resto.Front.Api.Data.Orders;
 using Resto.Front.Api.Data.Payments;
 using Resto.Front.Api.Editors;
 using Resto.Front.Api.Extensions;
+using Resto.Front.Api.CustomerScreen.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -82,6 +83,17 @@ namespace Resto.Front.Api.CustomerScreen.View
             {
                 orderDishes = value;
                 OnPropertyChanged(nameof(OrderDishes));
+            }
+        }
+
+        private Dictionary<Guid, string> dishDisplayNames = new Dictionary<Guid, string>();
+        public Dictionary<Guid, string> DishDisplayNames
+        {
+            get => dishDisplayNames;
+            set
+            {
+                dishDisplayNames = value;
+                OnPropertyChanged(nameof(DishDisplayNames));
             }
         }
 
@@ -190,33 +202,52 @@ namespace Resto.Front.Api.CustomerScreen.View
                     return;
                 }
                 
-                // Select 4 random products
-                var random = new Random();
-                var selectedProducts = allProducts.OrderBy(x => random.Next()).Take(4).ToList();
-
-                PluginContext.Log.Info("selected ---------->");
-                foreach (var product in selectedProducts)
-                {
-                    PluginContext.Log.Info(
-                        $"Product: Id={product.Id}, Name={product.Name}, Price={product.Price}, FullName={product.FullName}, FastCode={product.FastCode}"
-                    );
-                }
-                // Store ONLY the randomly selected dishes for UI display (not all dishes)
-                OrderDishes = new ObservableCollection<IProduct>(selectedProducts);
+                // Emulate API response - return 1-10 items from the list
+                var apiResponseItems = EmulateApiResponse();
+                PluginContext.Log.Info($"Emulated API response returned {apiResponseItems.Count} items: {string.Join(", ", apiResponseItems)}");
                 
+                // Map API response strings to dishes
+                var mappedDishes = new List<DishMappingResult>();
+                Func<IProductScale, IEnumerable<IProductSize>> getSizes = (scale) => PluginContext.Operations.GetProductScaleSizes(scale);
+                foreach (var item in apiResponseItems)
+                {
+                    var mapped = DishMappingHelper.MapStringToDish(item, allProducts, getSizes);
+                    if (mapped != null)
+                    {
+                        mappedDishes.Add(mapped);
+                        PluginContext.Log.Info($"Mapped '{item}' to dish: {mapped.DisplayName}");
+                    }
+                    else
+                    {
+                        PluginContext.Log.Info($"Warning: Could not map '{item}' to any dish");
+                    }
+                }
+                
+                if (mappedDishes.Count == 0)
+                {
+                    PluginContext.Log.Info("No dishes could be mapped from API response");
+                    ErrorMessage = "No dishes could be mapped from API response";
+                    CurrentScreen = ScreenType.Error;
+                    return;
+                }
+                
+                // Store mapped dishes for UI display
+                var productsForDisplay = mappedDishes.Select(m => m.Product).ToList();
+                OrderDishes = new ObservableCollection<IProduct>(productsForDisplay);
+                
+                // Store display names for UI
+                DishDisplayNames = mappedDishes.ToDictionary(m => m.Product.Id, m => m.DisplayName);
+
                 CurrentScreen = ScreenType.Success;
                 
-                // Add products to order (some with modifiers, some without)
-                for (int i = 0; i < selectedProducts.Count; i++)
+                // Add mapped products to order
+                foreach (var mappedDish in mappedDishes)
                 {
-                    var product = selectedProducts[i];
-                    //var size = product.Scale?.DefaultSize;
-                    //PluginContext.Log.Info($"Size {product.Name}: {size}");
+                    var product = mappedDish.Product;
+                    var size = mappedDish.Size;
 
-                    IProductSize size = null;
-
-                    // If product has a scale, we must provide a size
-                    if (product.Scale != null)
+                    // If product has a scale but no size was mapped, try to get default or first available
+                    if (product.Scale != null && size == null)
                     {
                         // Try to use default size first
                         size = product.Scale.DefaultSize;
@@ -231,7 +262,7 @@ namespace Resto.Front.Api.CustomerScreen.View
                             if (availableSizes.Count > 0)
                             {
                                 size = availableSizes.FirstOrDefault();
-                                PluginContext.Log.Info($"No default size for {product.Name}, using first available: {size?.Name}");
+                                PluginContext.Log.Info($"No mapped size for {product.Name}, using first available: {size?.Name}");
                             }
                         }
 
@@ -240,6 +271,7 @@ namespace Resto.Front.Api.CustomerScreen.View
                             PluginContext.Log.Info($"Warning: Product {product.Name} has scale but no sizes available");
                         }
                     }
+                    
                     var productStub = editSession.AddOrderProductItem(1m, product, newOrder, guest1, size);
                     // Add modifiers to every other product (products at index 0 and 2 will have modifiers)
                     // if (i % 2 == 0)
@@ -271,6 +303,37 @@ namespace Resto.Front.Api.CustomerScreen.View
                     var groupModifiers = product.GetGroupModifiers(null);
                     foreach (var groupModifier in groupModifiers)
                     {
+                        // If we have a specific modifier ID from mapping, use it (preferred)
+                        if (mappedDish.ModifierProductId.HasValue)
+                        {
+                            var modifierItem = groupModifier.Items.FirstOrDefault(item => 
+                                item.Product.Id == mappedDish.ModifierProductId.Value);
+                            
+                            if (modifierItem != null)
+                            {
+                                var amount = Math.Max(1, modifierItem.MinimumAmount);
+                                if (amount == 0) amount = 1;
+                                editSession.AddOrderModifierItem(amount, modifierItem.Product, groupModifier.ProductGroup, newOrder, productStub);
+                                PluginContext.Log.Info($"Added mapped group modifier {modifierItem.Product.Name} (ID: {modifierItem.Product.Id}) for {product.Name}");
+                                continue; // Skip default handling for this group
+                            }
+                        }
+                        // Fallback: If we have a specific modifier name from mapping, try to use it
+                        else if (!string.IsNullOrEmpty(mappedDish.ModifierName))
+                        {
+                            var modifierItem = groupModifier.Items.FirstOrDefault(item => 
+                                item.Product.Name.Equals(mappedDish.ModifierName, StringComparison.OrdinalIgnoreCase));
+                            
+                            if (modifierItem != null)
+                            {
+                                var amount = Math.Max(1, modifierItem.MinimumAmount);
+                                if (amount == 0) amount = 1;
+                                editSession.AddOrderModifierItem(amount, modifierItem.Product, groupModifier.ProductGroup, newOrder, productStub);
+                                PluginContext.Log.Info($"Added mapped group modifier {modifierItem.Product.Name} for {product.Name}");
+                                continue; // Skip default handling for this group
+                            }
+                        }
+                        
                         // Check if this group is required (has minimum amount > 0)
                         if (groupModifier.MinimumAmount > 0)
                         {
@@ -318,7 +381,6 @@ namespace Resto.Front.Api.CustomerScreen.View
                             }
                         }
                     }
-                    // }
                 }
                 
                 var result = PluginContext.Operations.SubmitChanges(editSession, credentials);
@@ -340,6 +402,32 @@ namespace Resto.Front.Api.CustomerScreen.View
                 .ToList();
             
             Dishes = allProducts;
+        }
+
+        private List<string> EmulateApiResponse()
+        {
+            // Emulate API response - return 1-10 random items from the list
+            var allPossibleItems = new List<string>
+            {
+                "ayran", "baklava", "baklava long", "belyshi", "bouillon", "bread", "cake",
+                "canned 0.45", "carcade", "ceazer", "cheesecake", "chicken garnish",
+                "chicken garnish half", "chicken no garnish", "coffee", "coffee 3 in 1",
+                "cola 0.3", "cola 0.5", "cola 1l", "cola 1l zero", "compote", "dizzy canned",
+                "fanta", "fanta 0.3", "fuse 0.3", "fuse 0.5", "fuse 1l", "garnish",
+                "golubets bouillon", "gorilla", "lemonade", "lemonade glass", "manty",
+                "maxi tea", "maxi tea 1.2", "meat garnish", "meat garnish half",
+                "meat no garnish", "medovic", "milk tea", "olivier", "pelmeni", "pepsi 0.5",
+                "pirozhok", "plov", "poacha", "quyrdak", "rolled bread", "salad",
+                "samsa cheese", "samsa chicken", "samsa meat", "sausage with dough",
+                "soup", "tamdyr samsa meat", "tandyr samsa chicken", "tandyr samsa meat",
+                "tea", "tea green", "tea teapot", "tsoman", "vareniki", "water 0.5"
+            };
+
+            var random = new Random();
+            var count = random.Next(1, 11); // Random number between 1 and 10
+            var selectedItems = allPossibleItems.OrderBy(x => random.Next()).Take(count).ToList();
+            
+            return selectedItems;
         }
 
         private void RepeatScanButton_Click(object sender, RoutedEventArgs e)
