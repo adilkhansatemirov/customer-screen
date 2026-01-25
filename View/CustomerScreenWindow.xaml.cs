@@ -4,6 +4,7 @@ using Resto.Front.Api.Data.Orders;
 using Resto.Front.Api.Data.Payments;
 using Resto.Front.Api.Editors;
 using Resto.Front.Api.Extensions;
+using Resto.Front.Api.CustomerScreen.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -82,6 +83,17 @@ namespace Resto.Front.Api.CustomerScreen.View
             {
                 orderDishes = value;
                 OnPropertyChanged(nameof(OrderDishes));
+            }
+        }
+
+        private Dictionary<Guid, string> dishDisplayNames = new Dictionary<Guid, string>();
+        public Dictionary<Guid, string> DishDisplayNames
+        {
+            get => dishDisplayNames;
+            set
+            {
+                dishDisplayNames = value;
+                OnPropertyChanged(nameof(DishDisplayNames));
             }
         }
 
@@ -190,48 +202,186 @@ namespace Resto.Front.Api.CustomerScreen.View
                     return;
                 }
                 
-                // Select 4 random products
-                var random = new Random();
-                var selectedProducts = allProducts.OrderBy(x => random.Next()).Take(4).ToList();
+                // Emulate API response - return 1-10 items from the list
+                var apiResponseItems = EmulateApiResponse();
+                PluginContext.Log.Info($"Emulated API response returned {apiResponseItems.Count} items: {string.Join(", ", apiResponseItems)}");
                 
-                // Store ONLY the randomly selected dishes for UI display (not all dishes)
-                OrderDishes = new ObservableCollection<IProduct>(selectedProducts);
+                // Map API response strings to dishes
+                var mappedDishes = new List<DishMappingResult>();
+                Func<IProductScale, IEnumerable<IProductSize>> getSizes = (scale) => PluginContext.Operations.GetProductScaleSizes(scale);
+                foreach (var item in apiResponseItems)
+                {
+                    var mapped = DishMappingHelper.MapStringToDish(item, allProducts, getSizes);
+                    if (mapped != null)
+                    {
+                        mappedDishes.Add(mapped);
+                        PluginContext.Log.Info($"Mapped '{item}' to dish: {mapped.DisplayName}");
+                    }
+                    else
+                    {
+                        PluginContext.Log.Info($"Warning: Could not map '{item}' to any dish");
+                    }
+                }
                 
+                if (mappedDishes.Count == 0)
+                {
+                    PluginContext.Log.Info("No dishes could be mapped from API response");
+                    ErrorMessage = "No dishes could be mapped from API response";
+                    CurrentScreen = ScreenType.Error;
+                    return;
+                }
+                
+                // Store mapped dishes for UI display
+                var productsForDisplay = mappedDishes.Select(m => m.Product).ToList();
+                OrderDishes = new ObservableCollection<IProduct>(productsForDisplay);
+                
+                // Store display names for UI
+                DishDisplayNames = mappedDishes.ToDictionary(m => m.Product.Id, m => m.DisplayName);
+
                 CurrentScreen = ScreenType.Success;
                 
-                // Add products to order (some with modifiers, some without)
-                // for (int i = 0; i < selectedProducts.Count; i++)
-                // {
-                //     var product = selectedProducts[i];
-                //     var size = product.Scale?.DefaultSize;
-                //     var productStub = editSession.AddOrderProductItem(1m, product, newOrder, guest1, size);
+                // Add mapped products to order
+                foreach (var mappedDish in mappedDishes)
+                {
+                    var product = mappedDish.Product;
+                    var size = mappedDish.Size;
+
+                    // If product has a scale but no size was mapped, try to get default or first available
+                    if (product.Scale != null && size == null)
+                    {
+                        // Try to use default size first
+                        size = product.Scale.DefaultSize;
+
+                        // If no default size, get the first available size from the scale
+                        if (size == null)
+                        {
+                            var availableSizes = PluginContext.Operations.GetProductScaleSizes(product.Scale)
+                                .Except(PluginContext.Operations.GetDisabledSizesByProduct(product))
+                                .ToList();
+
+                            if (availableSizes.Count > 0)
+                            {
+                                size = availableSizes.FirstOrDefault();
+                                PluginContext.Log.Info($"No mapped size for {product.Name}, using first available: {size?.Name}");
+                            }
+                        }
+
+                        if (size == null)
+                        {
+                            PluginContext.Log.Info($"Warning: Product {product.Name} has scale but no sizes available");
+                        }
+                    }
                     
-                //     // Add modifiers to every other product (products at index 0 and 2 will have modifiers)
-                //     if (i % 2 == 0)
-                //     {
-                //         // Add simple modifiers
-                //         var simpleModifiers = product.GetSimpleModifiers(null)
-                //             .Where(x => x.DefaultAmount != 0)
-                //             .Take(2); // Limit to 2 modifiers per product
-                //         foreach (var modifier in simpleModifiers)
-                //         {
-                //             editSession.AddOrderModifierItem(modifier.DefaultAmount, modifier.Product, null, newOrder, productStub);
-                //         }
+                    var productStub = editSession.AddOrderProductItem(1m, product, newOrder, guest1, size);
+                    // Add modifiers to every other product (products at index 0 and 2 will have modifiers)
+                    // if (i % 2 == 0)
+                    // {
+                    // Add simple modifiers
+                    var simpleModifiers = product.GetSimpleModifiers(null);
+                            // .Where(x => x.DefaultAmount != 0)
+                            // .Take(2); // Limit to 2 modifiers per product
+                        foreach (var modifier in simpleModifiers)
+                        {
+                            PluginContext.Log.Info($"Simple Modifier for product {product.Name}: {modifier.MinimumAmount}, DefaultAmount: {modifier.DefaultAmount}");
+                            // editSession.AddOrderModifierItem(modifier.DefaultAmount, modifier.Product, null, newOrder, productStub);
+                        }
+
+                    // Add group modifiers
+                    //var groupModifiers = product.GetGroupModifiers(null);
+                    //foreach (var groupModifier in groupModifiers)
+                    //{
+                    //var itemsToAdd = groupModifier.Items;
+                    //        // .Where(x => x.DefaultAmount != 0)
+                    //        // .Take(1); // Add one item from each group
+                    //    foreach (var item in itemsToAdd)
+                    //    {
+                    //        PluginContext.Log.Info($"Group Modifier for product {product.Name}: {groupModifier.MinimumAmount}, DefaultAmount: {item.DefaultAmount}");
+                    //        // editSession.AddOrderModifierItem(item.DefaultAmount, item.Product, groupModifier.ProductGroup, newOrder, productStub);
+                    //    }
+                    //}
+                    // Add group modifiers - MUST handle required groups (MinimumAmount > 0)
+                    var groupModifiers = product.GetGroupModifiers(null);
+                    foreach (var groupModifier in groupModifiers)
+                    {
+                        // If we have a specific modifier ID from mapping, use it (preferred)
+                        if (mappedDish.ModifierProductId.HasValue)
+                        {
+                            var modifierItem = groupModifier.Items.FirstOrDefault(item => 
+                                item.Product.Id == mappedDish.ModifierProductId.Value);
+                            
+                            if (modifierItem != null)
+                            {
+                                var amount = Math.Max(1, modifierItem.MinimumAmount);
+                                if (amount == 0) amount = 1;
+                                editSession.AddOrderModifierItem(amount, modifierItem.Product, groupModifier.ProductGroup, newOrder, productStub);
+                                PluginContext.Log.Info($"Added mapped group modifier {modifierItem.Product.Name} (ID: {modifierItem.Product.Id}) for {product.Name}");
+                                continue; // Skip default handling for this group
+                            }
+                        }
+                        // Fallback: If we have a specific modifier name from mapping, try to use it
+                        else if (!string.IsNullOrEmpty(mappedDish.ModifierName))
+                        {
+                            var modifierItem = groupModifier.Items.FirstOrDefault(item => 
+                                item.Product.Name.Equals(mappedDish.ModifierName, StringComparison.OrdinalIgnoreCase));
+                            
+                            if (modifierItem != null)
+                            {
+                                var amount = Math.Max(1, modifierItem.MinimumAmount);
+                                if (amount == 0) amount = 1;
+                                editSession.AddOrderModifierItem(amount, modifierItem.Product, groupModifier.ProductGroup, newOrder, productStub);
+                                PluginContext.Log.Info($"Added mapped group modifier {modifierItem.Product.Name} for {product.Name}");
+                                continue; // Skip default handling for this group
+                            }
+                        }
                         
-                //         // Add group modifiers
-                //         var groupModifiers = product.GetGroupModifiers(null);
-                //         foreach (var groupModifier in groupModifiers)
-                //         {
-                //             var itemsToAdd = groupModifier.Items
-                //                 .Where(x => x.DefaultAmount != 0)
-                //                 .Take(1); // Add one item from each group
-                //             foreach (var item in itemsToAdd)
-                //             {
-                //                 editSession.AddOrderModifierItem(item.DefaultAmount, item.Product, groupModifier.ProductGroup, newOrder, productStub);
-                //             }
-                //         }
-                //     }
-                // }
+                        // Check if this group is required (has minimum amount > 0)
+                        if (groupModifier.MinimumAmount > 0)
+                        {
+                            // This is a REQUIRED group - we must add at least MinimumAmount items
+                            var count = 0;
+                            var itemsToAdd = groupModifier.Items
+                                .OrderBy(item => item.MinimumAmount)
+                                .ThenBy(item => item.DefaultAmount)
+                                .ToList();
+
+                            foreach (var item in itemsToAdd)
+                            {
+                                var amount = item.MinimumAmount;
+                                if (amount == 0 || item.DefaultAmount != 0)
+                                    amount = item.DefaultAmount;
+                                if (amount == 0)
+                                    amount = Math.Min(item.MaximumAmount, groupModifier.MaximumAmount - count);
+
+                                if (amount > 0)
+                                {
+                                    editSession.AddOrderModifierItem(amount, item.Product, groupModifier.ProductGroup, newOrder, productStub);
+                                    count += amount;
+                                    PluginContext.Log.Info($"Added required group modifier {item.Product.Name} (amount: {amount}) for {product.Name}");
+
+                                    // Stop if we've met the minimum requirement and reached max
+                                    if (count >= groupModifier.MaximumAmount)
+                                        break;
+                                }
+                            }
+
+                            // Verify we met the minimum requirement
+                            if (count < groupModifier.MinimumAmount)
+                            {
+                                PluginContext.Log.Info($"Warning: Required group modifier {groupModifier.ProductGroup.Name} for {product.Name} needs at least {groupModifier.MinimumAmount} items, but only {count} were added");
+                            }
+                        }
+                        else
+                        {
+                            // Optional group - only add items with default amounts
+                            var itemsToAdd = groupModifier.Items.Where(x => x.DefaultAmount > 0);
+                            foreach (var item in itemsToAdd)
+                            {
+                                editSession.AddOrderModifierItem(item.DefaultAmount, item.Product, groupModifier.ProductGroup, newOrder, productStub);
+                                PluginContext.Log.Info($"Added optional group modifier {item.Product.Name} for {product.Name}");
+                            }
+                        }
+                    }
+                }
                 
                 var result = PluginContext.Operations.SubmitChanges(editSession, credentials);
                 currentOrder = result.Get(newOrder);
@@ -252,6 +402,32 @@ namespace Resto.Front.Api.CustomerScreen.View
                 .ToList();
             
             Dishes = allProducts;
+        }
+
+        private List<string> EmulateApiResponse()
+        {
+            // Emulate API response - return 1-10 random items from the list
+            var allPossibleItems = new List<string>
+            {
+                "ayran", "baklava", "baklava long", "belyshi", "bouillon", "bread", "cake",
+                "canned 0.45", "carcade", "ceazer", "cheesecake", "chicken garnish",
+                "chicken garnish half", "chicken no garnish", "coffee", "coffee 3 in 1",
+                "cola 0.3", "cola 0.5", "cola 1l", "cola 1l zero", "compote", "dizzy canned",
+                "fanta", "fanta 0.3", "fuse 0.3", "fuse 0.5", "fuse 1l", "garnish",
+                "golubets bouillon", "gorilla", "lemonade", "lemonade glass", "manty",
+                "maxi tea", "maxi tea 1.2", "meat garnish", "meat garnish half",
+                "meat no garnish", "medovic", "milk tea", "olivier", "pelmeni", "pepsi 0.5",
+                "pirozhok", "plov", "poacha", "quyrdak", "rolled bread", "salad",
+                "samsa cheese", "samsa chicken", "samsa meat", "sausage with dough",
+                "soup", "tamdyr samsa meat", "tandyr samsa chicken", "tandyr samsa meat",
+                "tea", "tea green", "tea teapot", "tsoman", "vareniki", "water 0.5"
+            };
+
+            var random = new Random();
+            var count = random.Next(1, 11); // Random number between 1 and 10
+            var selectedItems = allPossibleItems.OrderBy(x => random.Next()).Take(count).ToList();
+            
+            return selectedItems;
         }
 
         private void RepeatScanButton_Click(object sender, RoutedEventArgs e)
