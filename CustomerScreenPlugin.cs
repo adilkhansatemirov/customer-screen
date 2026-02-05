@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -13,6 +13,7 @@ using Resto.Front.Api.CustomerScreen.View;
 using Resto.Front.Api.CustomerScreen.ViewModel;
 using Resto.Front.Api.Attributes.JetBrains;
 using Resto.Front.Api.Data.Screens;
+using Resto.Front.Api.UI;
 
 namespace Resto.Front.Api.CustomerScreen
 {
@@ -58,6 +59,27 @@ namespace Resto.Front.Api.CustomerScreen
                     unsubscribe.Add(PluginContext.Notifications.RestaurantChanged
                         .ObserveOn(DispatcherScheduler.Current)
                         .Subscribe(r => OnRestaurantChanged(r.Currency)));
+
+                    unsubscribe.Add(PluginContext.Operations.AddButtonToOrderEditScreen(
+                        "Mock scan dishes",
+                        x =>
+                        {
+                            x.vm.ChangeProgressBarMessage("Adding dishes...");
+                            try
+                            {
+                                var credentials = x.os.GetDefaultCredentials();
+                                var ok = OrderPopulationHelper.PopulateOrderWithEmulatedDishes(x.order, x.os, credentials);
+                                if (ok)
+                                    x.vm.ShowOkPopup("Customer Screen", "Emulated dishes added to the current order.");
+                                else
+                                    x.vm.ShowErrorPopup("Could not add dishes. Check that the order has a guest and that the menu has dishes.");
+                            }
+                            catch (Exception ex)
+                            {
+                                PluginContext.Log.Info("Add emulated dishes failed: " + ex.Message);
+                                x.vm.ShowErrorPopup("Error: " + ex.Message);
+                            }
+                        }));
 
                     ShowCustomerScreen(screenHelper);
                 });
