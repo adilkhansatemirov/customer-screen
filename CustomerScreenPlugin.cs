@@ -29,18 +29,41 @@ namespace Resto.Front.Api.CustomerScreen
         public CustomerScreenPlugin()
         {
             var screenHelper = new ScreenHelper();
-            if (!screenHelper.IsSecondMonitorExists)
-            {
-                PluginContext.Shutdown("Can't show customer screen. There is no second monitor.");
-                return;
-            }
 
             try
             {
                 CustomerScreenConfig.Init(PluginContext.Integration.GetConfigsDirectoryPath());
-                InitializeUiDispatcher(CultureInfo.CurrentCulture);
                 CurrencySettings = PluginContext.Operations.GetHostRestaurant().Currency;
 
+                // Always register "Mock scan dishes" button (with or without second monitor)
+                unsubscribe.Add(PluginContext.Operations.AddButtonToOrderEditScreen(
+                    "Mock scan dishes",
+                    x =>
+                    {
+                        x.vm.ChangeProgressBarMessage("Adding dishes...");
+                        try
+                        {
+                            var credentials = x.os.GetDefaultCredentials();
+                            var ok = OrderPopulationHelper.PopulateOrderWithEmulatedDishes(x.order, x.os, credentials);
+                            if (ok)
+                                x.vm.ShowOkPopup("Customer Screen", "Emulated dishes added to the current order.");
+                            else
+                                x.vm.ShowErrorPopup("Could not add dishes. Check that the order has a guest and that the menu has dishes.");
+                        }
+                        catch (Exception ex)
+                        {
+                            PluginContext.Log.Info("Add emulated dishes failed: " + ex.Message);
+                            x.vm.ShowErrorPopup("Error: " + ex.Message);
+                        }
+                    }));
+
+                if (!screenHelper.IsSecondMonitorExists)
+                {
+                    PluginContext.Log.Info("No second monitor: customer screen disabled, 'Mock scan dishes' button is available.");
+                    return;
+                }
+
+                InitializeUiDispatcher(CultureInfo.CurrentCulture);
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     vmOrder = new Order();
@@ -59,27 +82,6 @@ namespace Resto.Front.Api.CustomerScreen
                     unsubscribe.Add(PluginContext.Notifications.RestaurantChanged
                         .ObserveOn(DispatcherScheduler.Current)
                         .Subscribe(r => OnRestaurantChanged(r.Currency)));
-
-                    unsubscribe.Add(PluginContext.Operations.AddButtonToOrderEditScreen(
-                        "Mock scan dishes",
-                        x =>
-                        {
-                            x.vm.ChangeProgressBarMessage("Adding dishes...");
-                            try
-                            {
-                                var credentials = x.os.GetDefaultCredentials();
-                                var ok = OrderPopulationHelper.PopulateOrderWithEmulatedDishes(x.order, x.os, credentials);
-                                if (ok)
-                                    x.vm.ShowOkPopup("Customer Screen", "Emulated dishes added to the current order.");
-                                else
-                                    x.vm.ShowErrorPopup("Could not add dishes. Check that the order has a guest and that the menu has dishes.");
-                            }
-                            catch (Exception ex)
-                            {
-                                PluginContext.Log.Info("Add emulated dishes failed: " + ex.Message);
-                                x.vm.ShowErrorPopup("Error: " + ex.Message);
-                            }
-                        }));
 
                     ShowCustomerScreen(screenHelper);
                 });
@@ -121,7 +123,7 @@ namespace Resto.Front.Api.CustomerScreen
 
         private static void OnChangeSumChanged(decimal sum)
         {
-            customerScreen.ChangeSumChanged(sum);
+            customerScreen?.ChangeSumChanged(sum);
         }
 
         private static void OnRestaurantChanged(ICurrencySettings currencySettings)
