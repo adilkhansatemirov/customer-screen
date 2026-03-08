@@ -25,7 +25,7 @@ namespace Resto.Front.Api.CustomerScreen
     {
         private const int ModuleId = 10000;
         // SVG path for a camera icon (body, lens circle, viewfinder bump)
-        private const string CameraIcon = "M 4 6 L 6 6 L 8 4 L 16 4 L 18 6 L 20 6 L 20 18 L 4 18 Z M 12 11 m -3.5 0 a 3.5 3.5 0 1 1 7 0 a 3.5 3.5 0 1 1 -7 0 M 10 8 L 10 7 L 14 7 L 14 8 Z";
+        private const string CameraIcon = "M 4 6 L 6 6 L 8 4 L 16 4 L 18 6 L 20 6 L 20 18 L 4 18 Z M 12 11 m -3.5 0 a 3.5 3.5 0 1 1 7 0 a 3.5 3.5 0 1 1 -7 0";
         private readonly CompositeDisposable unsubscribe = new CompositeDisposable();
         private static Order vmOrder;
         private static CustomerScreenWindow customerScreen;
