@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Windows;
 using Resto.Front.Api.CustomerScreen.Settings;
+using Resto.Front.Api.Data.Orders;
 using Resto.Front.Api.Attributes;
 using Resto.Front.Api.Data.Organization;
 using Resto.Front.Api.CustomerScreen.Helpers;
@@ -21,6 +24,8 @@ namespace Resto.Front.Api.CustomerScreen
     public sealed class CustomerScreenPlugin : IFrontPlugin
     {
         private const int ModuleId = 10000;
+        // SVG path for a camera icon (body, lens circle, viewfinder bump)
+        private const string CameraIcon = "M 4 6 L 6 6 L 8 4 L 16 4 L 18 6 L 20 6 L 20 18 L 4 18 Z M 12 11 m -3.5 0 a 3.5 3.5 0 1 1 7 0 a 3.5 3.5 0 1 1 -7 0 M 10 8 L 10 7 L 14 7 L 14 8 Z";
         private readonly CompositeDisposable unsubscribe = new CompositeDisposable();
         private static Order vmOrder;
         private static CustomerScreenWindow customerScreen;
@@ -35,27 +40,26 @@ namespace Resto.Front.Api.CustomerScreen
                 CustomerScreenConfig.Init(PluginContext.Integration.GetConfigsDirectoryPath());
                 CurrencySettings = PluginContext.Operations.GetHostRestaurant().Currency;
 
-                // Always register "Mock scan dishes" button (with or without second monitor)
+                // Always register "Сканировать" button (with or without second monitor)
                 unsubscribe.Add(PluginContext.Operations.AddButtonToOrderEditScreen(
-                    "Mock scan dishes",
+                    "Сканировать",
                     x =>
                     {
-                        x.vm.ChangeProgressBarMessage("Adding dishes...");
+                        x.vm.ChangeProgressBarMessage("Сканируем и добавляем блюда...");
                         try
                         {
                             var credentials = x.os.GetDefaultCredentials();
                             var ok = OrderPopulationHelper.PopulateOrderWithEmulatedDishes(x.order, x.os, credentials);
-                            if (ok)
-                                x.vm.ShowOkPopup("Customer Screen", "Emulated dishes added to the current order.");
-                            else
-                                x.vm.ShowErrorPopup("Could not add dishes. Check that the order has a guest and that the menu has dishes.");
+                            if (!ok)
+                                x.vm.ShowErrorPopup("Не удалось добавить блюда. Проверьте, что в заказе есть гость и в меню есть блюда.");
                         }
                         catch (Exception ex)
                         {
                             PluginContext.Log.Info("Add emulated dishes failed: " + ex.Message);
-                            x.vm.ShowErrorPopup("Error: " + ex.Message);
+                            x.vm.ShowErrorPopup("Ошибка: " + ex.Message);
                         }
-                    }));
+                    },
+                    CameraIcon));
 
                 if (!screenHelper.IsSecondMonitorExists)
                 {
