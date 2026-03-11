@@ -12,11 +12,52 @@ namespace Resto.Front.Api.CustomerScreen.Helpers
 {
     public static class OrderPopulationHelper
     {
+        /// <summary>
+        /// Collects all dish products from the hierarchical menu (all categories).
+        /// Logs every dish Id, Name, and category path.
+        /// </summary>
+        public static List<IProduct> GetDishesFromAllCategories()
+        {
+            var menu = PluginContext.Operations.GetHierarchicalMenu();
+            var seenIds = new HashSet<Guid>();
+            var result = new List<IProduct>();
+            var categoryStack = new List<string>();
+
+            void CollectFromProducts(IEnumerable<IProduct> products, string categoryPath)
+            {
+                foreach (var p in products ?? Enumerable.Empty<IProduct>())
+                {
+                    if (p.Type != ProductType.Dish || p.Template != null)
+                        continue;
+                    if (seenIds.Add(p.Id))
+                    {
+                        result.Add(p);
+                        PluginContext.Log.Info($"[Dish] Id={p.Id}, Name=\"{p.Name}\", Category=\"{categoryPath}\"");
+                    }
+                }
+            }
+
+            void CollectFromGroup(IProductGroup group, string categoryPath)
+            {
+                var path = string.IsNullOrEmpty(categoryPath) ? group.Name : categoryPath + " / " + group.Name;
+                var childProducts = PluginContext.Operations.GetChildProductsByProductGroup(group);
+                var childGroups = PluginContext.Operations.GetChildGroupsByProductGroup(group);
+                CollectFromProducts(childProducts, path);
+                foreach (var child in childGroups ?? Enumerable.Empty<IProductGroup>())
+                    CollectFromGroup(child, path);
+            }
+
+            CollectFromProducts(menu.Products, "(root)");
+            foreach (var group in menu.ProductGroups ?? Enumerable.Empty<IProductGroup>())
+                CollectFromGroup(group, "");
+
+            PluginContext.Log.Info($"[Dishes] Total from all categories: {result.Count}. All IDs: {string.Join(", ", result.Select(p => p.Id))}");
+            return result;
+        }
+
         public static List<IProduct> GetDishes()
         {
-            return PluginContext.Operations.GetActiveProducts()
-                .Where(p => p.Type == ProductType.Dish && p.Template == null)
-                .ToList();
+            return GetDishesFromAllCategories();
         }
 
         public static List<string> EmulateApiResponse()

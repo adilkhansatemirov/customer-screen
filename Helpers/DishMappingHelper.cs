@@ -53,63 +53,63 @@ namespace Resto.Front.Api.CustomerScreen.Helpers
                 { "tsoman", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("8d103a09-a6fa-4b94-93cc-edb036ec3f79")) },
                 { "vareniki", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("55ea063d-3e6d-4862-9af1-00252c1d0d41")) },
 
-                // Baklava with sizes
-                { "baklava", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("71f24063-2e2e-4d14-87b6-c5330a21bc0a"), Guid.Parse("d81d684e-35a3-4394-a3da-415244c7ddc0")) },
-                { "baklava long", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("71f24063-2e2e-4d14-87b6-c5330a21bc0a"), Guid.Parse("06e9f4c7-7e57-4ecb-8e92-6ca57c7fc84f")) },
+                // Baklava
+                { "baklava", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("71f24063-2e2e-4d14-87b6-c5330a21bc0a")) },
+                { "baklava long", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("71f24063-2e2e-4d14-87b6-c5330a21bc0a")) },
 
-                // Chicken Garnish with sizes
-                { "chicken garnish", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("70d4f74a-09cc-4140-ad0b-564d602548ab"), Guid.Parse("07137b5f-4475-498a-88b2-4a5259df55d9")) },
-                { "chicken garnish half", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("70d4f74a-09cc-4140-ad0b-564d602548ab"), Guid.Parse("f9c8ee71-0521-4eb2-b854-d7220f0ad37e")) },
+                // Chicken Garnish
+                { "chicken garnish", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("70d4f74a-09cc-4140-ad0b-564d602548ab")) },
+                { "chicken garnish half", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("156732f7-06e7-409c-bbed-a39f8cca00c4")) },
 
-                // Meat Garnish with sizes
-                { "meat garnish", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("c0155373-0cf6-46e4-a2da-ec6a049573c1"), Guid.Parse("07137b5f-4475-498a-88b2-4a5259df55d9")) },
-                { "meat garnish half", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("c0155373-0cf6-46e4-a2da-ec6a049573c1"), Guid.Parse("f9c8ee71-0521-4eb2-b854-d7220f0ad37e")) },
+                // Meat Garnish
+                { "meat garnish", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("c0155373-0cf6-46e4-a2da-ec6a049573c1")) },
+                { "meat garnish half", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("d14b354d-be6b-4591-bc08-c11cd7faea00")) },
 
-                // Coffee with modifiers
+                // Coffee
                 { "coffee", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("4e6ba5d3-28c6-4203-8263-dea4129bebb1")) },
-                { "coffee 3 in 1", (dishes, getSizes) => MapDishWithModifierById(dishes, Guid.Parse("4e6ba5d3-28c6-4203-8263-dea4129bebb1"), Guid.Parse("fde67fac-0a45-43ec-ae7d-3d585420412f")) },
+                { "coffee 3 in 1", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("97a68dc6-9522-4919-afed-b2fc0762e7fd")) },
 
-                // Cola with sizes
-                { "cola 0.3", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("c1a6f8a7-305b-4020-9014-b3a6126c0859"), Guid.Parse("8592a3ba-bfc2-4d09-8bbb-43b61d04fa76")) },
-                { "cola 0.5", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("c1a6f8a7-305b-4020-9014-b3a6126c0859"), Guid.Parse("dbf111b3-5ed6-457a-9c75-3dcba20d958b")) },
-                { "cola 1l", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("c1a6f8a7-305b-4020-9014-b3a6126c0859"), Guid.Parse("fb0e24f1-873b-4b72-988f-d1242ee95cbb")) },
-                { "cola 1l zero", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("c1a6f8a7-305b-4020-9014-b3a6126c0859"), Guid.Parse("d54c6bbe-0c16-4015-93fb-8dc3ad145d83")) },
+                // Cola
+                { "cola 0.3", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("c1a6f8a7-305b-4020-9014-b3a6126c0859")) },
+                { "cola 0.5", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("c1a6f8a7-305b-4020-9014-b3a6126c0859")) },
+                { "cola 1l", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("c1a6f8a7-305b-4020-9014-b3a6126c0859")) },
+                { "cola 1l zero", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("c1a6f8a7-305b-4020-9014-b3a6126c0859")) },
 
-                // Fanta with sizes
-                { "fanta", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("9bdb9e1e-21d7-4c10-9dc3-1b0d20abf9ed"), Guid.Parse("dbf111b3-5ed6-457a-9c75-3dcba20d958b")) },
-                { "fanta 0.3", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("9bdb9e1e-21d7-4c10-9dc3-1b0d20abf9ed"), Guid.Parse("8592a3ba-bfc2-4d09-8bbb-43b61d04fa76")) },
+                // Fanta
+                { "fanta", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("9bdb9e1e-21d7-4c10-9dc3-1b0d20abf9ed")) },
+                { "fanta 0.3", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("9bdb9e1e-21d7-4c10-9dc3-1b0d20abf9ed")) },
 
-                // Fuse with sizes
-                { "fuse 0.3", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("50dc11b2-1ee0-4367-b4ae-0cc1aa12a920"), Guid.Parse("8592a3ba-bfc2-4d09-8bbb-43b61d04fa76")) },
-                { "fuse 0.5", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("50dc11b2-1ee0-4367-b4ae-0cc1aa12a920"), Guid.Parse("dbf111b3-5ed6-457a-9c75-3dcba20d958b")) },
-                { "fuse 1l", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("50dc11b2-1ee0-4367-b4ae-0cc1aa12a920"), Guid.Parse("fb0e24f1-873b-4b72-988f-d1242ee95cbb")) },
+                // Fuse (separate products per size in menu)
+                { "fuse 0.3", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("ba61bcb9-00a8-45f1-8ea9-914d7f9318f2")) },
+                { "fuse 0.5", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("a4020ce9-b64b-485b-b04b-6bc67881a75b")) },
+                { "fuse 1l", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("50dc11b2-1ee0-4367-b4ae-0cc1aa12a920")) },
 
-                // Lemonade with sizes
-                { "lemonade", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("291d97ef-aa53-4b82-9604-f3f3c7b8195f"), Guid.Parse("dbf111b3-5ed6-457a-9c75-3dcba20d958b")) },
-                { "lemonade glass", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("291d97ef-aa53-4b82-9604-f3f3c7b8195f"), Guid.Parse("160e4142-bce8-42ed-b526-71d920aaaff7")) },
+                // Lemonade
+                { "lemonade", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("291d97ef-aa53-4b82-9604-f3f3c7b8195f")) },
+                { "lemonade glass", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("d8a57b3a-8d0d-4f4b-99ba-8e2e65e62f65")) },
 
-                // Maxi Tea with sizes
+                // Maxi Tea
                 { "maxi tea", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("b31cbfaf-3330-4c16-ada3-0a4dbdbf6d0a"), Guid.Parse("dbf111b3-5ed6-457a-9c75-3dcba20d958b")) },
-                { "maxi tea 1.2", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("b31cbfaf-3330-4c16-ada3-0a4dbdbf6d0a"), Guid.Parse("fb0e24f1-873b-4b72-988f-d1242ee95cbb")) },
+                { "maxi tea 1.2", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("eb821282-6e71-4ed3-a3e6-65220501b0c4")) },
 
-                // Tea with sizes and modifiers
-                { "tea", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("ecdfc085-6137-4f08-a69f-5327876f05a6"), Guid.Parse("a008195b-402d-4207-bc3e-be1334b0bd66")) },
-                { "tea green", (dishes, getSizes) => MapDishWithModifierById(dishes, Guid.Parse("ecdfc085-6137-4f08-a69f-5327876f05a6"), Guid.Parse("bb295802-0cc8-434c-94c4-1ae9cab7dffa")) },
-                { "tea teapot", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("ecdfc085-6137-4f08-a69f-5327876f05a6"), Guid.Parse("96f32557-9404-42f8-a029-ef3c7c1960e6")) },
+                // Tea
+                { "tea", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("ecdfc085-6137-4f08-a69f-5327876f05a6")) },
+                { "tea green", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("dede55fd-7e7c-419b-bbfe-b2d4042fadb9")) },
+                { "tea teapot", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("60719545-4741-4ec7-a897-5cc9330db7ab")) },
 
-                // Samsa with modifiers
-                { "samsa cheese", (dishes, getSizes) => MapDishWithModifierById(dishes, Guid.Parse("657f6b5e-95e9-4561-bd0f-a2925ab03c91"), Guid.Parse("83e545b7-bbed-4300-a582-db860b3a99b3")) },
-                { "samsa chicken", (dishes, getSizes) => MapDishWithModifierById(dishes, Guid.Parse("657f6b5e-95e9-4561-bd0f-a2925ab03c91"), Guid.Parse("cab327ff-b462-499f-b359-137d4aeb2d24")) },
-                { "samsa meat", (dishes, getSizes) => MapDishWithModifierById(dishes, Guid.Parse("657f6b5e-95e9-4561-bd0f-a2925ab03c91"), Guid.Parse("3b8a3605-1525-4e52-b219-32db7b1c2834")) },
+                // Samsa (separate products in menu)
+                { "samsa cheese", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("657f6b5e-95e9-4561-bd0f-a2925ab03c91")) },
+                { "samsa chicken", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("83556e08-520c-41d4-a5c6-f99512576358")) },
+                { "samsa meat", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("850ae161-8fe3-472b-911e-edcdbf94573e")) },
 
-                // Tandyr Samsa with modifiers
-                { "tandyr samsa chicken", (dishes, getSizes) => MapDishWithModifierById(dishes, Guid.Parse("f15362c7-a00e-4390-acfd-bb7c1d9581e7"), Guid.Parse("421e3bed-a33c-453f-bd3f-47dc42b6eeb5")) },
-                { "tandyr samsa meat", (dishes, getSizes) => MapDishWithModifierById(dishes, Guid.Parse("f15362c7-a00e-4390-acfd-bb7c1d9581e7"), Guid.Parse("388c2000-6654-48b2-8466-d197cccdf245")) },
-                { "tamdyr samsa meat", (dishes, getSizes) => MapDishWithModifierById(dishes, Guid.Parse("f15362c7-a00e-4390-acfd-bb7c1d9581e7"), Guid.Parse("388c2000-6654-48b2-8466-d197cccdf245")) },
+                // Tandyr Samsa (separate products in menu)
+                { "tandyr samsa chicken", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("f15362c7-a00e-4390-acfd-bb7c1d9581e7")) },
+                { "tandyr samsa meat", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("93819595-cfb7-40ac-9fc5-474670e096e6")) },
+                { "tamdyr samsa meat", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("93819595-cfb7-40ac-9fc5-474670e096e6")) },
 
                 // Doner dishes
                 { "донер в батоне", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("86f003ae-e62d-4ad2-a1cc-9b80573c9e93")) },
-                { "донер в лаваше", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("f1370bbc-56f6-4676-8da6-f7ca9149dd6a")) },
+                { "донер в лаваше", (dishes, getSizes) => MapDishById(dishes, Guid.Parse("ff1d6fe8-f6e8-4e6a-ac55-19ee8b9e7a55")) },
 
                 // Canned drinks - using Dizzy canned with Canned size
                 { "canned 0.45", (dishes, getSizes) => MapDishWithSizeById(dishes, getSizes, Guid.Parse("92c24cbe-239b-4354-bca5-88e8722b29d1"), Guid.Parse("d2a91ca6-efd2-4b2a-8a01-5724c2c2df58")) },
