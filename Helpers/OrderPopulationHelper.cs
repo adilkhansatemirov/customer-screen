@@ -14,14 +14,13 @@ namespace Resto.Front.Api.CustomerScreen.Helpers
     {
         /// <summary>
         /// Collects all dish products from the hierarchical menu (all categories).
-        /// Logs every dish Id, Name, and category path.
+        /// When logDishes is true, logs every dish Id, Name, and category path (use only on plugin load).
         /// </summary>
-        public static List<IProduct> GetDishesFromAllCategories()
+        public static List<IProduct> GetDishesFromAllCategories(bool logDishes = false)
         {
             var menu = PluginContext.Operations.GetHierarchicalMenu();
             var seenIds = new HashSet<Guid>();
             var result = new List<IProduct>();
-            var categoryStack = new List<string>();
 
             void CollectFromProducts(IEnumerable<IProduct> products, string categoryPath)
             {
@@ -32,7 +31,8 @@ namespace Resto.Front.Api.CustomerScreen.Helpers
                     if (seenIds.Add(p.Id))
                     {
                         result.Add(p);
-                        PluginContext.Log.Info($"[Dish] Id={p.Id}, Name=\"{p.Name}\", Category=\"{categoryPath}\"");
+                        if (logDishes)
+                            PluginContext.Log.Info($"[Dish] Id={p.Id}, Name=\"{p.Name}\", Category=\"{categoryPath}\"");
                     }
                 }
             }
@@ -51,13 +51,14 @@ namespace Resto.Front.Api.CustomerScreen.Helpers
             foreach (var group in menu.ProductGroups ?? Enumerable.Empty<IProductGroup>())
                 CollectFromGroup(group, "");
 
-            PluginContext.Log.Info($"[Dishes] Total from all categories: {result.Count}. All IDs: {string.Join(", ", result.Select(p => p.Id))}");
+            if (logDishes)
+                PluginContext.Log.Info($"[Dishes] Total from all categories: {result.Count}. All IDs: {string.Join(", ", result.Select(p => p.Id))}");
             return result;
         }
 
         public static List<IProduct> GetDishes()
         {
-            return GetDishesFromAllCategories();
+            return GetDishesFromAllCategories(logDishes: false);
         }
 
         public static List<string> EmulateApiResponse()

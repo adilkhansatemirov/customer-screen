@@ -40,6 +40,9 @@ namespace Resto.Front.Api.CustomerScreen
                 CustomerScreenConfig.Init(PluginContext.Integration.GetConfigsDirectoryPath());
                 CurrencySettings = PluginContext.Operations.GetHostRestaurant().Currency;
 
+                // Log all dishes once on plugin load (not on every scan)
+                OrderPopulationHelper.GetDishesFromAllCategories(logDishes: true);
+
                 // Always register "Сканировать" button (with or without second monitor)
                 unsubscribe.Add(PluginContext.Operations.AddButtonToOrderEditScreen(
                     "Сканировать",
