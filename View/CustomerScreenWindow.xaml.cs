@@ -1,4 +1,3 @@
-﻿using Newtonsoft.Json;
 using Resto.Front.Api.Data.Assortment;
 using Resto.Front.Api.Data.Orders;
 using Resto.Front.Api.Data.Payments;
@@ -10,7 +9,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -202,9 +200,8 @@ namespace Resto.Front.Api.CustomerScreen.View
                     return;
                 }
                 
-                // Emulate API response - return 1-10 items from the list
-                var apiResponseItems = EmulateApiResponse();
-                PluginContext.Log.Info($"Emulated API response returned {apiResponseItems.Count} items: {string.Join(", ", apiResponseItems)}");
+                var apiResponseItems = OrderPopulationHelper.FetchMenuItemNamesFromApi();
+                PluginContext.Log.Info($"Menu API returned {apiResponseItems.Count} items: {string.Join(", ", apiResponseItems)}");
                 
                 // Map API response strings to dishes
                 var mappedDishes = new List<DishMappingResult>();
@@ -402,32 +399,6 @@ namespace Resto.Front.Api.CustomerScreen.View
                 .ToList();
             
             Dishes = allProducts;
-        }
-
-        private List<string> EmulateApiResponse()
-        {
-            // Emulate API response - return 1-10 random items from the list
-            var allPossibleItems = new List<string>
-            {
-                "ayran", "baklava", "baklava long", "belyshi", "bouillon", "bread", "cake",
-                "canned 0.45", "carcade", "ceazer", "cheesecake", "chicken garnish",
-                "chicken garnish half", "chicken no garnish", "coffee", "coffee 3 in 1",
-                "cola 0.3", "cola 0.5", "cola 1l", "cola 1l zero", "compote", "dizzy canned",
-                "fanta", "fanta 0.3", "fuse 0.3", "fuse 0.5", "fuse 1l", "garnish",
-                "golubets bouillon", "gorilla", "lemonade", "lemonade glass", "manty",
-                "maxi tea", "maxi tea 1.2", "meat garnish", "meat garnish half",
-                "meat no garnish", "medovic", "milk tea", "olivier", "pelmeni", "pepsi 0.5",
-                "pirozhok", "plov", "poacha", "quyrdak", "rolled bread", "salad",
-                "samsa cheese", "samsa chicken", "samsa meat", "sausage with dough",
-                "soup", "tamdyr samsa meat", "tandyr samsa chicken", "tandyr samsa meat",
-                "tea", "tea green", "tea teapot", "tsoman", "vareniki", "water 0.5"
-            };
-
-            var random = new Random();
-            var count = random.Next(1, 11); // Random number between 1 and 10
-            var selectedItems = allPossibleItems.OrderBy(x => random.Next()).Take(count).ToList();
-            
-            return selectedItems;
         }
 
         private void RepeatScanButton_Click(object sender, RoutedEventArgs e)
