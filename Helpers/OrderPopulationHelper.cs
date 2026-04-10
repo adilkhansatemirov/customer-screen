@@ -14,7 +14,7 @@ namespace Resto.Front.Api.CustomerScreen.Helpers
 {
     public static class OrderPopulationHelper
     {
-        private const string MenuApiUrl = "http://192.168.1.11:8082/menu";
+        private const string MenuApiUrl = "http://172.20.10.3:8081/scan";
 
         private static readonly HttpClient MenuHttpClient = new HttpClient
         {
@@ -33,12 +33,136 @@ namespace Resto.Front.Api.CustomerScreen.Helpers
             public string Name { get; set; }
         }
 
+        // TEMP: pool for random mock scan responses (same strings as expected ForeignName / API names)
+        //private static readonly object MockScanRngLock = new object();
+        //private static readonly Random MockScanRng = new Random();
+
+        //private static readonly string[] MockScanCatalog =
+        //{
+        //    "baklava",
+        //    "baklava sarma",
+        //    "belyshi",
+        //    "bouillon",
+        //    "bread",
+        //    "cake baklava european nut",
+        //    "cake black forest",
+        //    "cake cheesecake",
+        //    "cake chocolate",
+        //    "cake curd",
+        //    "cake curd cranberry",
+        //    "cake curd lemon",
+        //    "cake medovik",
+        //    "cake medovik homemade",
+        //    "cake medovik nuts",
+        //    "cake milk girl",
+        //    "cake napoleon square",
+        //    "cake napoleon triangle",
+        //    "ceazer",
+        //    "chicken garnish",
+        //    "chicken garnish half",
+        //    "chicken no garnish",
+        //    "chicken zapekanka",
+        //    "coffee",
+        //    "coffee 3 in 1",
+        //    "drink arzu 0.5",
+        //    "drink arzu 1",
+        //    "drink ayran",
+        //    "drink carcade",
+        //    "drink cola 0.3",
+        //    "drink cola 0.5",
+        //    "drink cola 1",
+        //    "drink cola zero 1",
+        //    "drink compote",
+        //    "drink dizzy canned",
+        //    "drink dizzy glass",
+        //    "drink fanta 0.3",
+        //    "drink fanta 0.5",
+        //    "drink fanta 1",
+        //    "drink fest berry 0.5",
+        //    "drink fest berry 1",
+        //    "drink fest berry canned",
+        //    "drink fuse 0.3",
+        //    "drink fuse 0.5",
+        //    "drink fuse 1",
+        //    "drink garden",
+        //    "drink gorilla",
+        //    "drink granat riks",
+        //    "drink happy lemonade",
+        //    "drink ice tea riks 0.5",
+        //    "drink ice tea riks 1",
+        //    "drink kvas",
+        //    "drink lemonade glass riks",
+        //    "drink lemonade glass zlatoyar",
+        //    "drink lemonade plastic zlatoyar",
+        //    "drink lime time 0.5",
+        //    "drink lime time 1",
+        //    "drink maxi tea 0.5",
+        //    "drink maxi tea 1",
+        //    "drink maxi tea 2",
+        //    "drink mohito ochakovo",
+        //    "drink mohito riks",
+        //    "drink piko 1",
+        //    "drink sevens water",
+        //    "drink sprite 0.5",
+        //    "drink tassay 1",
+        //    "drink zet",
+        //    "garnish",
+        //    "golubets bouillon",
+        //    "manty",
+        //    "manty half",
+        //    "meat garnish",
+        //    "meat garnish half",
+        //    "meat no garnish",
+        //    "milk tea",
+        //    "olivier",
+        //    "pegodi round",
+        //    "pelmeni",
+        //    "pepsi 0.5",
+        //    "pirozhok",
+        //    "plov",
+        //    "plov half",
+        //    "poacha",
+        //    "quyrdak",
+        //    "rolled bread",
+        //    "salad",
+        //    "samsa cheese",
+        //    "samsa chicken",
+        //    "samsa meat",
+        //    "sausage with dough",
+        //    "soup",
+        //    "tandyr samsa chicken",
+        //    "tandyr samsa meat",
+        //    "tea bag",
+        //    "tea black",
+        //    "tea green",
+        //    "tea teapot",
+        //    "tea with milk",
+        //    "tsoman",
+        //    "vareniki",
+        //};
+
         /// <summary>
         /// GET menu endpoint; returns dish name strings from <c>items[].name</c>.
         /// On failure logs and returns an empty list.
         /// </summary>
         public static List<string> FetchMenuItemNamesFromApi()
         {
+            // TEMP: mock scan — random 6–7 picks from catalog each call (uncomment HTTP block below for real API)
+            //List<string> mockPicks;
+            //lock (MockScanRngLock)
+            //{
+            //    var pickCount = MockScanRng.Next(6, 8); // 6 or 7
+            //    mockPicks = MockScanCatalog
+            //        .OrderBy(_ => MockScanRng.Next())
+            //        .Take(pickCount)
+            //        .ToList();
+            //}
+
+            //PluginContext.Log.Info(
+            //    $"FetchMenuItemNamesFromApi: mock ({mockPicks.Count} items, HTTP disabled): {string.Join(", ", mockPicks)}");
+            //return mockPicks;
+
+            
             try
             {
                 var json = MenuHttpClient.GetStringAsync(MenuApiUrl).GetAwaiter().GetResult();
@@ -55,11 +179,12 @@ namespace Resto.Front.Api.CustomerScreen.Helpers
                 PluginContext.Log.Info("Menu API GET failed: " + ex.Message);
                 return new List<string>();
             }
+            
         }
 
         /// <summary>
         /// Collects all dish products from the hierarchical menu (all categories).
-        /// When logDishes is true, logs every dish Id, Name, and category path (use only on plugin load).
+        /// When logDishes is true, logs every dish Id, Name, ForeignName (Название на иностранном языке), and category path (use only on plugin load).
         /// </summary>
         public static List<IProduct> GetDishesFromAllCategories(bool logDishes = false)
         {
@@ -77,7 +202,7 @@ namespace Resto.Front.Api.CustomerScreen.Helpers
                     {
                         result.Add(p);
                         if (logDishes)
-                            PluginContext.Log.Info($"[Dish] Id={p.Id}, Name=\"{p.Name}\", Category=\"{categoryPath}\"");
+                            PluginContext.Log.Info($"[Dish] Id={p.Id}, Name=\"{p.Name}\", ForeignName=\"{p.ForeignName}\", Category=\"{categoryPath}\"");
                     }
                 }
             }
@@ -131,11 +256,10 @@ namespace Resto.Front.Api.CustomerScreen.Helpers
             var apiResponseItems = FetchMenuItemNamesFromApi();
             PluginContext.Log.Info($"Menu API returned {apiResponseItems.Count} items: {string.Join(", ", apiResponseItems)}");
 
-            Func<IProductScale, IEnumerable<IProductSize>> getSizes = scale => PluginContext.Operations.GetProductScaleSizes(scale);
             var mappedDishes = new List<DishMappingResult>();
             foreach (var item in apiResponseItems)
             {
-                var mapped = DishMappingHelper.MapStringToDish(item, allProducts, getSizes);
+                var mapped = DishMappingHelper.MapStringToDish(item, allProducts);
                 if (mapped != null)
                 {
                     mappedDishes.Add(mapped);

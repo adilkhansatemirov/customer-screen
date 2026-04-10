@@ -205,10 +205,9 @@ namespace Resto.Front.Api.CustomerScreen.View
                 
                 // Map API response strings to dishes
                 var mappedDishes = new List<DishMappingResult>();
-                Func<IProductScale, IEnumerable<IProductSize>> getSizes = (scale) => PluginContext.Operations.GetProductScaleSizes(scale);
                 foreach (var item in apiResponseItems)
                 {
-                    var mapped = DishMappingHelper.MapStringToDish(item, allProducts, getSizes);
+                    var mapped = DishMappingHelper.MapStringToDish(item, allProducts);
                     if (mapped != null)
                     {
                         mappedDishes.Add(mapped);
